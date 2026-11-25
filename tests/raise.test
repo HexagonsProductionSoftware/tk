@@ -63,6 +63,12 @@ proc raise_makeToplevels {} {
 
 toplevel .raise
 wm geom .raise 250x200+0+0
+# raise_getOrder asks the screen which window is at a point, so another application's window over
+# .raise makes these tests fail. Keep .raise in front of the windows that are not topmost; that
+# does not change the stacking order of the windows inside .raise, which these tests check.
+if {[tk windowingsystem] eq "win32"} {
+    wm attributes .raise -topmost 1
+}
 
 test raise-1.1 {preserve creation order} {
     raise_setup

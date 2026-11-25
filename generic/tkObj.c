@@ -77,6 +77,9 @@ static void		DupWindowInternalRep _ANSI_ARGS_((Tcl_Obj *srcPtr,
 static void		FreeMMInternalRep _ANSI_ARGS_((Tcl_Obj *objPtr));
 static void		FreePixelInternalRep _ANSI_ARGS_((Tcl_Obj *objPtr));
 static void		FreeWindowInternalRep _ANSI_ARGS_((Tcl_Obj *objPtr));
+static int		GetPixelsFromObjEx _ANSI_ARGS_((Tcl_Interp *interp,
+			    Tk_Window tkwin, Tcl_Obj *objPtr, int *intPtr,
+			    double *dblPtr));
 static void		UpdateStringOfMM _ANSI_ARGS_((Tcl_Obj *objPtr));
 static int		SetMMFromAny _ANSI_ARGS_((Tcl_Interp *interp,
 			    Tcl_Obj *objPtr));
@@ -131,6 +134,97 @@ static Tcl_ObjType windowObjType = {
 /*
  *----------------------------------------------------------------------
  *
+ * GetPixelsFromObjEx --
+ *
+ *	Attempt to return a pixel value from the Tcl object "objPtr". If the
+ *	object is not already a pixel value, an attempt will be made to convert
+ *	it to one.
+ *
+ *	Backported from Tk 8.5 (bugs 1813597 and 2218964), together with
+ *	Tk_GetDoublePixelsFromObj: canvas coordinates without units are no
+ *	longer converted to millimeters and back, which lost precision.
+ *
+ * Results:
+ *	The return value is a standard Tcl object result. If an error occurs
+ *	during conversion, an error message is left in the interpreter's
+ *	result unless "interp" is NULL. The pixels are stored in *intPtr and,
+ *	if dblPtr is not NULL, unrounded in *dblPtr.
+ *
+ * Side effects:
+ *	If the object is not already a pixel, the conversion will free
+ *	any old internal representation.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+GetPixelsFromObjEx(interp, tkwin, objPtr, intPtr, dblPtr)
+    Tcl_Interp *interp; 	/* Used for error reporting if not NULL. */
+    Tk_Window tkwin;
+    Tcl_Obj *objPtr;		/* The object from which to get pixels. */
+    int *intPtr;		/* Place to store resulting pixels. */
+    double *dblPtr;		/* Place to store the unrounded pixels, or
+				 * NULL. */
+{
+    int result, fresh;
+    double d;
+    PixelRep *pixelPtr;
+    static double bias[] = {
+	1.0,	10.0,	25.4,	25.4 / 72.0
+    };
+
+  retry:
+    if (objPtr->typePtr != &pixelObjType) {
+	result = SetPixelFromAny(interp, objPtr);
+	if (result != TCL_OK) {
+	    return result;
+	}
+	fresh = 1;
+    } else {
+	fresh = 0;
+    }
+
+    if (SIMPLE_PIXELREP(objPtr)) {
+	*intPtr = GET_SIMPLEPIXEL(objPtr);
+	if (dblPtr) {
+	    *dblPtr = (double) (*intPtr);
+	}
+    } else {
+	pixelPtr = GET_COMPLEXPIXEL(objPtr);
+	if ((!fresh) && (pixelPtr->tkwin != tkwin)) {
+	    /*
+	     * Tk_GetDoublePixelsFromObj may have turned a value in other
+	     * units into pixels of another screen: convert from the string
+	     * again.
+	     */
+
+	    FreePixelInternalRep(objPtr);
+	    goto retry;
+	}
+	if ((pixelPtr->tkwin != tkwin) || dblPtr) {
+	    d = pixelPtr->value;
+	    if (pixelPtr->units >= 0) {
+		d *= bias[pixelPtr->units] * WidthOfScreen(Tk_Screen(tkwin));
+		d /= WidthMMOfScreen(Tk_Screen(tkwin));
+	    }
+	    if (d < 0) {
+		pixelPtr->returnValue = (int) (d - 0.5);
+	    } else {
+		pixelPtr->returnValue = (int) (d + 0.5);
+	    }
+	    pixelPtr->tkwin = tkwin;
+	    if (dblPtr) {
+		*dblPtr = d;
+	    }
+	}
+        *intPtr = pixelPtr->returnValue;
+    }
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
  * Tk_GetPixelsFromObj --
  *
  *	Attempt to return a pixel value from the Tcl object "objPtr". If the
@@ -144,7 +238,7 @@ static Tcl_ObjType windowObjType = {
  *
  * Side effects:
  *	If the object is not already a pixel, the conversion will free
- *	any old internal representation. 
+ *	any old internal representation.
  *
  *----------------------------------------------------------------------
  */
@@ -156,39 +250,57 @@ Tk_GetPixelsFromObj(interp, tkwin, objPtr, intPtr)
     Tcl_Obj *objPtr;		/* The object from which to get pixels. */
     int *intPtr;		/* Place to store resulting pixels. */
 {
-    int result;
+    return GetPixelsFromObjEx(interp, tkwin, objPtr, intPtr, NULL);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tk_GetDoublePixelsFromObj --
+ *
+ *	Attempt to return a double pixel value from the Tcl object "objPtr".
+ *	If the object is not already a pixel value, an attempt will be made
+ *	to convert it to one, the internal unit being pixels.
+ *
+ * Results:
+ *	The return value is a standard Tcl object result. If an error occurs
+ *	during conversion, an error message is left in the interpreter's
+ *	result unless "interp" is NULL.
+ *
+ * Side effects:
+ *	If the object is not already a pixel, the conversion will free
+ *	any old internal representation.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+Tk_GetDoublePixelsFromObj(interp, tkwin, objPtr, doublePtr)
+    Tcl_Interp *interp; 	/* Used for error reporting if not NULL. */
+    Tk_Window tkwin;
+    Tcl_Obj *objPtr;		/* The object from which to get pixels. */
+    double *doublePtr;		/* Place to store resulting pixels. */
+{
     double d;
+    int result, val;
     PixelRep *pixelPtr;
-    static double bias[] = {
-	1.0,	10.0,	25.4,	25.4 / 72.0
-    };
 
-    if (objPtr->typePtr != &pixelObjType) {
-	result = SetPixelFromAny(interp, objPtr);
-	if (result != TCL_OK) {
-	    return result;
-	}
+    result = GetPixelsFromObjEx(interp, tkwin, objPtr, &val, &d);
+    if (result != TCL_OK) {
+	return result;
     }
-
-    if (SIMPLE_PIXELREP(objPtr)) {
-	*intPtr = GET_SIMPLEPIXEL(objPtr);
-    } else {
+    if (!SIMPLE_PIXELREP(objPtr)) {
 	pixelPtr = GET_COMPLEXPIXEL(objPtr);
-	if (pixelPtr->tkwin != tkwin) {
-	    d = pixelPtr->value;
-	    if (pixelPtr->units >= 0) {
-		d *= bias[pixelPtr->units] * WidthOfScreen(Tk_Screen(tkwin));
-		d /= WidthMMOfScreen(Tk_Screen(tkwin));
-	    }
-	    if (d < 0) {
-		pixelPtr->returnValue = (int) (d - 0.5);
-	    } else {
-		pixelPtr->returnValue = (int) (d + 0.5);
-	    }
-	    pixelPtr->tkwin = tkwin;
+	if (pixelPtr->units >= 0) {
+	    /*
+	     * Internally "shimmer" to pixel units.
+	     */
+
+	    pixelPtr->units = -1;
+	    pixelPtr->value = d;
 	}
-        *intPtr = pixelPtr->returnValue;
     }
+    *doublePtr = d;
     return TCL_OK;
 }
 

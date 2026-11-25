@@ -118,7 +118,7 @@ XCreateGC(display, d, mask, values)
 
     gp = (XGCValues *)ckalloc(sizeof(XGCValues) + MAX_DASH_LIST_SIZE);
     if (!gp) {
-	return None;
+	return NULL;
     }
 
     gp->function = 	(mask & GCFunction) 	?values->function	:GXcopy;
@@ -134,11 +134,11 @@ XCreateGC(display, d, mask, values)
     gp->fill_style =  	(mask & GCFillStyle)	?values->fill_style	:FillSolid;
     gp->fill_rule =  	(mask & GCFillRule)	?values->fill_rule	:WindingRule;
     gp->arc_mode = 	(mask & GCArcMode)	?values->arc_mode	:ArcPieSlice;
-    gp->tile = 		(mask & GCTile)		?values->tile		:None;
-    gp->stipple = 	(mask & GCStipple)	?values->stipple	:None;
+    gp->tile = 		(mask & GCTile)		?values->tile		:0;
+    gp->stipple = 	(mask & GCStipple)	?values->stipple	:0;
     gp->ts_x_origin = 	(mask & GCTileStipXOrigin)	?values->ts_x_origin:0;
     gp->ts_y_origin = 	(mask & GCTileStipYOrigin)	?values->ts_y_origin:0;
-    gp->font = 		(mask & GCFont)		?values->font		:None;
+    gp->font = 		(mask & GCFont)		?values->font		:0;
     gp->subwindow_mode = (mask & GCSubwindowMode)?values->subwindow_mode:ClipByChildren;
     gp->graphics_exposures = (mask & GCGraphicsExposures)?values->graphics_exposures:True;
     gp->clip_x_origin = (mask & GCClipXOrigin)	?values->clip_x_origin	:0;

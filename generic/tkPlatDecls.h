@@ -45,6 +45,11 @@ EXTERN void		Tk_PointerEvent _ANSI_ARGS_((HWND hwnd, int x, int y));
 EXTERN int		Tk_TranslateWinEvent _ANSI_ARGS_((HWND hwnd,
 				UINT message, WPARAM wParam, LPARAM lParam,
 				LRESULT *result));
+
+/* Added by RH 27-2-2006 */
+EXTERN void		GenerateXEvent _ANSI_ARGS_((HWND hwnd, UINT message, 
+							WPARAM wParam, LPARAM lParam));
+/* End added */
 #endif /* WIN */
 #ifdef MAC_OSX_TK /* AQUA */
 /* 0 */

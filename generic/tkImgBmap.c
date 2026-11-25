@@ -63,7 +63,7 @@ typedef struct BitmapInstance {
     Pixmap mask;		/* Mask: only display bitmap pixels where
 				 * there are 1's here. */
     GC gc;			/* Graphics context for displaying bitmap.
-				 * None means there was an error while
+				 * NULL means there was an error while
 				 * setting up the instance, so it cannot
 				 * be displayed. */
     struct BitmapInstance *nextPtr;
@@ -429,7 +429,7 @@ ImgBmapConfigureInstance(instancePtr)
 	if (instancePtr->bg != NULL) {
 	    gcValues.background = instancePtr->bg->pixel;
 	    mask |= GCBackground;
-	    if (instancePtr->mask != None) {
+	    if (instancePtr->mask != NULL) {
 		gcValues.clip_mask = instancePtr->mask;
 		mask |= GCClipMask;
 	    }
@@ -439,9 +439,9 @@ ImgBmapConfigureInstance(instancePtr)
 	}
 	gc = Tk_GetGC(instancePtr->tkwin, mask, &gcValues);
     } else {
-	gc = None;
+	gc = NULL;
     }
-    if (instancePtr->gc != None) {
+    if (instancePtr->gc != NULL) {
 	Tk_FreeGC(Tk_Display(instancePtr->tkwin), instancePtr->gc);
     }
     instancePtr->gc = gc;
@@ -454,10 +454,10 @@ ImgBmapConfigureInstance(instancePtr)
      * the error.
      */
 
-    if (instancePtr->gc != None) {
+    if (instancePtr->gc != NULL) {
 	Tk_FreeGC(Tk_Display(instancePtr->tkwin), instancePtr->gc);
     }
-    instancePtr->gc = None;
+    instancePtr->gc = NULL;
     Tcl_AddErrorInfo(masterPtr->interp, "\n    (while configuring image \"");
     Tcl_AddErrorInfo(masterPtr->interp, Tk_NameOfImage(masterPtr->tkMaster));
     Tcl_AddErrorInfo(masterPtr->interp, "\")");
@@ -861,9 +861,9 @@ ImgBmapGet(tkwin, masterData)
     instancePtr->tkwin = tkwin;
     instancePtr->fg = NULL;
     instancePtr->bg = NULL;
-    instancePtr->bitmap = None;
-    instancePtr->mask = None;
-    instancePtr->gc = None;
+    instancePtr->bitmap = NULL;
+    instancePtr->mask = NULL;
+    instancePtr->gc = NULL;
     instancePtr->nextPtr = masterPtr->instancePtr;
     masterPtr->instancePtr = instancePtr;
     ImgBmapConfigureInstance(instancePtr);
@@ -917,7 +917,7 @@ ImgBmapDisplay(clientData, display, drawable, imageX, imageY, width,
      * while creating the image instance so it can't be displayed.
      */
 
-    if (instancePtr->gc == None) {
+    if (instancePtr->gc == NULL) {
 	return;
     }
 
@@ -928,7 +928,7 @@ ImgBmapDisplay(clientData, display, drawable, imageX, imageY, width,
      * a mask.
      */
 
-    masking = (instancePtr->mask != None) || (instancePtr->bg == NULL);
+    masking = (instancePtr->mask != NULL) || (instancePtr->bg == NULL);
     if (masking) {
 	XSetClipOrigin(display, instancePtr->gc, drawableX - imageX,
 		drawableY - imageY);
@@ -983,13 +983,13 @@ ImgBmapFree(clientData, display)
     if (instancePtr->bg != NULL) {
 	Tk_FreeColor(instancePtr->bg);
     }
-    if (instancePtr->bitmap != None) {
+    if (instancePtr->bitmap != NULL) {
 	Tk_FreePixmap(display, instancePtr->bitmap);
     }
-    if (instancePtr->mask != None) {
+    if (instancePtr->mask != NULL) {
 	Tk_FreePixmap(display, instancePtr->mask);
     }
-    if (instancePtr->gc != None) {
+    if (instancePtr->gc != NULL) {
 	Tk_FreeGC(display, instancePtr->gc);
     }
     if (instancePtr->masterPtr->instancePtr == instancePtr) {

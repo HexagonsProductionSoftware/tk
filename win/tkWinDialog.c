@@ -16,6 +16,10 @@
 #include <dlgs.h>       /* includes common dialog template defines */
 #include <cderr.h>      /* includes the common dialog error codes */
 
+// Changed by RH 18-12-2014: save/restore locale to work around locale changes by shell extensions or context menu handlers
+#include <locale.h>
+// End changed
+
 /*
  * This controls the use of the new style tk_chooseDirectory dialog.
  */
@@ -555,7 +559,7 @@ GetFileNameW(clientData, interp, objc, objv, open)
 {
     OPENFILENAMEW ofn;
     WCHAR file[TK_MULTI_MAX_PATH];
-    int result, winCode, oldMode, i, multi = 0;
+	int result, winCode, oldMode, i, multi = 0;
     char *extension, *filter, *title;
     Tk_Window tkwin;
     HWND hWnd;
@@ -564,6 +568,9 @@ GetFileNameW(clientData, interp, objc, objv, open)
     Tcl_Encoding unicodeEncoding = TkWinGetUnicodeEncoding();
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
             Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+	// Changed by RH 18-12-2014: save/restore locale to work around locale changes by shell extensions or context menu handlers
+	WCHAR current_locale[MAX_PATH];
+	// End changed
     enum options {
 	FILE_DEFAULT,	FILE_TYPES,	FILE_INITDIR,	FILE_INITFILE,
 	FILE_MULTIPLE,	FILE_PARENT,	FILE_TITLE
@@ -771,13 +778,18 @@ GetFileNameW(clientData, interp, objc, objv, open)
     /*
      * Popup the dialog.
      */
-
     oldMode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
+	// Changed by RH 18-12-2014: save/restore locale to work around locale changes by shell extensions or context menu handlers
+	wcscpy(current_locale, _wsetlocale(LC_ALL, NULL));
+	// End changed
     if (open != 0) {
 	winCode = GetOpenFileNameW(&ofn);
     } else {
 	winCode = GetSaveFileNameW(&ofn);
     }
+	// Changed by RH 18-12-2014: save/restore locale to work around locale changes by shell extensions or context menu handlers
+	_wsetlocale(LC_ALL, current_locale);
+	// End changed
     Tcl_SetServiceMode(oldMode);
     EatSpuriousMessageBugFix();
 
@@ -1048,6 +1060,9 @@ GetFileNameA(clientData, interp, objc, objv, open)
 	"-multiple", "-parent", "-title", NULL
     };
     CONST char **optionStrings;
+	// Changed by RH 18-12-2014: save/restore locale to work around locale changes by shell extensions or context menu handlers
+	TCHAR current_locale[MAX_PATH];
+	// End changed
 
     enum options {
 	FILE_DEFAULT,	FILE_TYPES,	FILE_INITDIR,	FILE_INITFILE,
@@ -1258,11 +1273,17 @@ GetFileNameA(clientData, interp, objc, objv, open)
 
     GetCurrentDirectory(MAX_PATH, savePath);
     oldMode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
+	// Changed by RH 18-12-2014: save/restore locale to work around locale changes by shell extensions or context menu handlers
+	_tcscpy(current_locale, _tsetlocale(LC_ALL, NULL));
+	// End changed
     if (open != 0) {
 	winCode = GetOpenFileName(&ofn);
     } else {
 	winCode = GetSaveFileName(&ofn);
     }
+	// Changed by RH 18-12-2014: save/restore locale to work around locale changes by shell extensions or context menu handlers
+	_tsetlocale(LC_ALL, current_locale);
+	// End changed
     Tcl_SetServiceMode(oldMode);
     EatSpuriousMessageBugFix();
     SetCurrentDirectory(savePath);

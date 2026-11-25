@@ -156,12 +156,12 @@ Tk_GetGC(tkwin, valueMask, valuePtr)
     if (valueMask & GCTile) {
 	valueKey.values.tile = valuePtr->tile;
     } else {
-	valueKey.values.tile = None;
+	valueKey.values.tile = NULL;
     }
     if (valueMask & GCStipple) {
 	valueKey.values.stipple = valuePtr->stipple;
     } else {
-	valueKey.values.stipple = None;
+	valueKey.values.stipple = NULL;
     }
     if (valueMask & GCTileStipXOrigin) {
 	valueKey.values.ts_x_origin = valuePtr->ts_x_origin;
@@ -176,7 +176,7 @@ Tk_GetGC(tkwin, valueMask, valuePtr)
     if (valueMask & GCFont) {
 	valueKey.values.font = valuePtr->font;
     } else {
-	valueKey.values.font = None;
+	valueKey.values.font = NULL;
     }
     if (valueMask & GCSubwindowMode) {
 	valueKey.values.subwindow_mode = valuePtr->subwindow_mode;
@@ -201,7 +201,7 @@ Tk_GetGC(tkwin, valueMask, valuePtr)
     if (valueMask & GCClipMask) {
 	valueKey.values.clip_mask = valuePtr->clip_mask;
     } else {
-	valueKey.values.clip_mask = None;
+	valueKey.values.clip_mask = NULL;
     }
     if (valueMask & GCDashOffset) {
 	valueKey.values.dash_offset = valuePtr->dash_offset;
@@ -237,8 +237,8 @@ Tk_GetGC(tkwin, valueMask, valuePtr)
      * Tk_MakeWindowExist on the window.
      */
 
-    freeDrawable = None;
-    if (Tk_WindowId(tkwin) != None) {
+    freeDrawable = NULL;
+    if (Tk_WindowId(tkwin) != NULL) {
 	d = Tk_WindowId(tkwin);
     } else if (valueKey.depth ==
 	    DefaultDepth(valueKey.display, valueKey.screenNum)) {
@@ -261,7 +261,7 @@ Tk_GetGC(tkwin, valueMask, valuePtr)
     }
     Tcl_SetHashValue(valueHashPtr, gcPtr);
     Tcl_SetHashValue(idHashPtr, gcPtr);
-    if (freeDrawable != None) {
+    if (freeDrawable != NULL) {
 	Tk_FreePixmap(valueKey.display, freeDrawable);
     }
 

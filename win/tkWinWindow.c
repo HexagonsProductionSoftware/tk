@@ -191,7 +191,7 @@ TkpPrintWindowId(buf, window)
  *	string is improperly formed then TCL_ERROR is returned and
  *	an error message will be left in the interp's result.  If the
  *	number does not correspond to a Tk Window, then *idPtr will
- *	be set to None.
+ *	be set to NULL.
  *
  * Side effects:
  *	None.
@@ -225,7 +225,7 @@ TkpScanWindowId(interp, string, idPtr)
     if (tkwin) {
 	*idPtr = Tk_WindowId(tkwin);
     } else {
-	*idPtr = None;
+	*idPtr = NULL;
     }
     return TCL_OK;
 }
@@ -256,7 +256,7 @@ TkpMakeWindow(winPtr, parent)
     int style;
     HWND hwnd;
     
-    if (parent != None) {
+    if (parent != NULL) {
 	parentWin = Tk_GetHWND(parent);
 	style = WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
     } else {
@@ -660,7 +660,7 @@ XConfigureWindow(display, w, value_mask, values)
 
     if (value_mask & CWStackMode) {
 	HWND sibling;
-	if ((value_mask & CWSibling) && (values->sibling != None)) {
+	if ((value_mask & CWSibling) && (values->sibling != NULL)) {
 	    sibling = Tk_GetHWND(values->sibling);
 	} else {
 	    sibling = NULL;

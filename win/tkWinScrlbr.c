@@ -202,7 +202,7 @@ UpdateScrollbar(scrollPtr)
  *	the instance, and generates a new Window object.
  *
  * Results:
- *	Returns the newly allocated Window object, or None on failure.
+ *	Returns the newly allocated Window object, or NULL on failure.
  *
  * Side effects:
  *	Causes a new Scrollbar control to come into existence.
@@ -246,7 +246,7 @@ CreateProc(tkwin, parentWin, instanceData)
 
     for (winPtr = ((TkWindow*)tkwin)->nextPtr; winPtr != NULL;
 	 winPtr = winPtr->nextPtr) {
-	if ((winPtr->window != None) && !(winPtr->flags & TK_TOP_HIERARCHY)) {
+	if ((winPtr->window != NULL) && !(winPtr->flags & TK_TOP_HIERARCHY)) {
 	    TkWinSetWindowPos(scrollPtr->hwnd, Tk_GetHWND(winPtr->window),
 		    Below);
 	    break;

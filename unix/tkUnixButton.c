@@ -174,7 +174,7 @@ TkpDisplayButton(clientData)
     if (butPtr->image != NULL) {
 	Tk_SizeOfImage(butPtr->image, &width, &height);
 	haveImage = 1;
-    } else if (butPtr->bitmap != None) {
+    } else if (butPtr->bitmap != NULL) {
 	Tk_SizeOfBitmap(butPtr->display, butPtr->bitmap, &width, &height);
 	haveImage = 1;
     }
@@ -637,7 +637,7 @@ TkpComputeButtonGeometry(butPtr)
     if (butPtr->image != NULL) {
 	Tk_SizeOfImage(butPtr->image, &width, &height);
 	haveImage = 1;
-    } else if (butPtr->bitmap != None) {
+    } else if (butPtr->bitmap != NULL) {
 	Tk_SizeOfBitmap(butPtr->display, butPtr->bitmap, &width, &height);
 	haveImage = 1;
     }
@@ -751,7 +751,7 @@ TkpComputeButtonGeometry(butPtr)
      * or lowered effect.
      */
 
-    if ((butPtr->image == NULL) && (butPtr->bitmap == None)) {
+    if ((butPtr->image == NULL) && (butPtr->bitmap == NULL)) {
 	width += 2*butPtr->padX;
 	height += 2*butPtr->padY;
     }

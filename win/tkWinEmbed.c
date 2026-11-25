@@ -153,7 +153,7 @@ TkpUseWindow(interp, tkwin, string)
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
             Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    if (winPtr->window != None) {
+    if (winPtr->window != NULL) {
         panic("TkpUseWindow: Already assigned a window");
     }
 

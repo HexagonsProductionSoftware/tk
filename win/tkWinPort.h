@@ -113,8 +113,8 @@
  */
 
 #define TkpDefineNativeBitmaps()
-#define TkpCreateNativeBitmap(display, source) None
-#define TkpGetNativeAppBitmap(display, name, w, h) None
+#define TkpCreateNativeBitmap(display, source) NULL
+#define TkpGetNativeAppBitmap(display, name, w, h) NULL
 
 #ifndef _TCLINT
 #include <tclInt.h>

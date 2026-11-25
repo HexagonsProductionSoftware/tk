@@ -1128,7 +1128,7 @@ TestobjconfigObjCmd(clientData, interp, objc, objv)
 	    recordPtr->index = 0;
 	    recordPtr->colorPtr = NULL;
 	    recordPtr->tkfont = NULL;
-	    recordPtr->bitmap = None;
+	    recordPtr->bitmap = NULL;
 	    recordPtr->border = NULL;
 	    recordPtr->relief = TK_RELIEF_FLAT;
 	    recordPtr->cursor = NULL;
@@ -2132,7 +2132,7 @@ TestpropCmd(clientData, interp, argc, argv)
 	    w, propName, 0, 100000, False, AnyPropertyType,
 	    &actualType, &actualFormat, &length,
 	    &bytesAfter, (unsigned char **) &property);
-    if ((result == Success) && (actualType != None)) {
+    if ((result == Success) && (actualType != NULL)) {
 	if ((actualFormat == 8) && (actualType == XA_STRING)) {
 	    for (p = property; ((unsigned long)(p-property)) < length; p++) {
 		if (*p == 0) {
@@ -2230,7 +2230,7 @@ TestsendCmd(clientData, interp, argc, argv)
 		    w, propName, 0, 100000, False, XA_STRING,
 		    &actualType, &actualFormat, &length,
 		    &bytesAfter, (unsigned char **) &property);
-	    if ((result == Success) && (actualType != None)
+	    if ((result == Success) && (actualType != NULL)
 		    && (actualFormat == 8) && (actualType == XA_STRING)) {
 		for (p = property; (p-property) < length; p++) {
 		    if (*p == 0) {
@@ -2422,8 +2422,8 @@ TestwrapperCmd(clientData, interp, argc, argv)
  *	See user documentation for expected results from these functions.
  *		CustomOptionSet		Standard Tcl Result.
  *		CustomOptionGet		Tcl_Obj * containing value.
- *		CustomOptionRestore	None.
- *		CustomOptionFree	None.
+ *		CustomOptionRestore	NULL.
+ *		CustomOptionFree	NULL.
  *
  * Side effects:
  *	Depends on the function.

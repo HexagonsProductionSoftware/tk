@@ -150,11 +150,11 @@ TkGetCursorByName(interp, tkwin, string)
 				 * for details on legal syntax. */
 {
     TkUnixCursor *cursorPtr = NULL;
-    Cursor cursor = None;
+    Cursor cursor = NULL;
     int argc;
     CONST char **argv = NULL;
-    Pixmap source = None;
-    Pixmap mask = None;
+    Pixmap source = NULL;
+    Pixmap mask = NULL;
     Display *display = Tk_Display(tkwin);
 
     if (Tcl_SplitList(interp, string, &argc, &argv) != TCL_OK) {
@@ -213,9 +213,9 @@ TkGetCursorByName(interp, tkwin, string)
 	    }
 	}
 	dispPtr = ((TkWindow *) tkwin)->dispPtr;
-	if (dispPtr->cursorFont == None) {
+	if (dispPtr->cursorFont == NULL) {
 	    dispPtr->cursorFont = XLoadFont(display, CURSORFONT);
-	    if (dispPtr->cursorFont == None) {
+	    if (dispPtr->cursorFont == NULL) {
 		Tcl_SetResult(interp, "couldn't load cursor font", TCL_STATIC);
 		goto cleanup;
 	    }
@@ -302,7 +302,7 @@ TkGetCursorByName(interp, tkwin, string)
 	}
     }
 
-    if (cursor != None) {
+    if (cursor != NULL) {
 	cursorPtr = (TkUnixCursor *) ckalloc(sizeof(TkUnixCursor));
 	cursorPtr->info.cursor = (Tk_Cursor) cursor;
 	cursorPtr->display = display;
@@ -312,10 +312,10 @@ TkGetCursorByName(interp, tkwin, string)
     if (argv != NULL) {
 	ckfree((char *) argv);
     }
-    if (source != None) {
+    if (source != NULL) {
 	Tk_FreePixmap(display, source);
     }
-    if (mask != None) {
+    if (mask != NULL) {
 	Tk_FreePixmap(display, mask);
     }
     return (TkCursor *) cursorPtr;
@@ -373,7 +373,7 @@ TkCreateCursorFromData(tkwin, source, mask, width, height, xHot, yHot,
     Tk_FreePixmap(display, sourcePixmap);
     Tk_FreePixmap(display, maskPixmap);
 
-    if (cursor != None) {
+    if (cursor != NULL) {
 	cursorPtr = (TkUnixCursor *) ckalloc(sizeof(TkUnixCursor));
 	cursorPtr->info.cursor = (Tk_Cursor) cursor;
 	cursorPtr->display = display;

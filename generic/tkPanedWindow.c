@@ -98,7 +98,7 @@ typedef struct PanedWindow {
     Tcl_Obj *heightPtr;		/* Tcl_Obj rep for height. */
     int width, height;		/* Width and height of the widget. */
     enum orient orient;		/* Orientation of the widget. */
-    Tk_Cursor cursor;		/* Current cursor for window, or None. */
+    Tk_Cursor cursor;		/* Current cursor for window, or NULL. */
     int resizeOpaque;		/* Boolean indicating whether resize should be
 				 * opaque or rubberband style. */
     
@@ -388,9 +388,9 @@ Tk_PanedWindowObjCmd(clientData, interp, objc, objv)
     pwPtr->optionTable	= pwOpts->pwOptions;
     pwPtr->slaveOpts	= pwOpts->slaveOpts;
     pwPtr->relief	= TK_RELIEF_RAISED;
-    pwPtr->gc		= None;
-    pwPtr->cursor	= None;
-    pwPtr->sashCursor	= None;
+    pwPtr->gc		= NULL;
+    pwPtr->cursor	= NULL;
+    pwPtr->sashCursor	= NULL;
 
     /*
      * Keep a hold of the associated tkwin until we destroy the widget,
@@ -802,7 +802,7 @@ ConfigureSlaves(pwPtr, interp, objc, objv)
      */
     index = -1;
     haveLoc = 0;
-    if (options.after != None) {
+    if (options.after != NULL) {
 	tkwin = options.after;
 	haveLoc = 1;
 	for (i = 0; i < pwPtr->numSlaves; i++) {
@@ -811,7 +811,7 @@ ConfigureSlaves(pwPtr, interp, objc, objv)
 		break;
 	    }
 	}
-    } else if (options.before != None) {
+    } else if (options.before != NULL) {
 	tkwin = options.before;
 	haveLoc = 1;
 	for (i = 0; i < pwPtr->numSlaves; i++) {
@@ -1238,7 +1238,7 @@ PanedWindowWorldChanged(instanceData)
     
     gcValues.background = Tk_3DBorderColor(pwPtr->background)->pixel;
     newGC = Tk_GetGC(pwPtr->tkwin, GCBackground, &gcValues);
-    if (pwPtr->gc != None) {
+    if (pwPtr->gc != NULL) {
 	Tk_FreeGC(pwPtr->display, pwPtr->gc);
     }
     pwPtr->gc = newGC;
@@ -1923,10 +1923,10 @@ Unlink(slavePtr)
      */
     for (i = 0; i < masterPtr->numSlaves; i++) {
 	if (masterPtr->slaves[i]->before == slavePtr->tkwin) {
-	    masterPtr->slaves[i]->before = None;
+	    masterPtr->slaves[i]->before = NULL;
 	}
 	if (masterPtr->slaves[i]->after == slavePtr->tkwin) {
-	    masterPtr->slaves[i]->after = None;
+	    masterPtr->slaves[i]->after = NULL;
 	}
     }
 

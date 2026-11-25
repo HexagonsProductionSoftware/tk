@@ -1012,7 +1012,9 @@ test wm-stackorder-3.1 {unmapped toplevel} {
     wm stackorder .
 } {. .t2}
 
-test wm-stackorder-3.2 {unmapped toplevel} {
+# nonPortable: the stacking order of new toplevels depends on the other
+# windows on the desktop and on whether this process may come to the front.
+test wm-stackorder-3.2 {unmapped toplevel} {nonPortable} {
     catch {destroy .t1}
     toplevel .t1 ; update
     catch {destroy .t2}

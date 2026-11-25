@@ -114,10 +114,19 @@ static Tcl_ThreadDataKey dataKey;
  * Forward declarations of procedures used in this file.
  */
 
+/* Moved to tkplatdecls.h by RH 27-2-2006: 
 static void		GenerateXEvent _ANSI_ARGS_((HWND hwnd, UINT message,
 			    WPARAM wParam, LPARAM lParam));
+*/
 static unsigned int	GetState _ANSI_ARGS_((UINT message, WPARAM wParam,
 			    LPARAM lParam));
+
+/* Added by RH 27-2-2006: 
+	support for saving changes before logout or shutdown of system */
+static LRESULT	CanExitApplication _ANSI_ARGS_((HWND hwnd, UINT message,
+			    WPARAM wParam, LPARAM lParam));
+/* End added by RH */
+
 static void 		GetTranslatedKey _ANSI_ARGS_((XKeyEvent *xkey));
 static void             UpdateInputLanguage _ANSI_ARGS_((int charset));
 static int              HandleIMEComposition _ANSI_ARGS_((HWND hwnd,
@@ -537,10 +546,10 @@ TkWinDisplayChanged(Display *display)
     screen->root_visual->bits_per_rgb = screen->root_depth;
     ReleaseDC(NULL, dc);
 
-    if (screen->cmap != None) {
+    if (screen->cmap != NULL) {
 	XFreeColormap(display, screen->cmap);
     }
-    screen->cmap = XCreateColormap(display, None, screen->root_visual,
+    screen->cmap = XCreateColormap(display, NULL, screen->root_visual,
 	    AllocNone);
 }
 
@@ -601,7 +610,7 @@ TkpOpenDisplay(display_name)
 
     twdPtr = (TkWinDrawable*) ckalloc(sizeof(TkWinDrawable));
     if (twdPtr == NULL) {
-	return None;
+	return NULL;
     }
     twdPtr->type = TWD_WINDOW;
     twdPtr->window.winPtr = NULL;
@@ -614,7 +623,7 @@ TkpOpenDisplay(display_name)
 
     screen->white_pixel = RGB(255, 255, 255);
     screen->black_pixel = RGB(0, 0, 0);
-    screen->cmap        = None;
+    screen->cmap        = NULL;
 
     display->screens		= screen;
     display->nscreens		= 1;
@@ -684,10 +693,10 @@ TkpCloseDisplay(dispPtr)
         if (display->screens->root_visual != NULL) {
             ckfree((char *) display->screens->root_visual);
         }
-        if (display->screens->root != None) {
+        if (display->screens->root != NULL) {
             ckfree((char *) display->screens->root);
         }
-        if (display->screens->cmap != None) {
+        if (display->screens->cmap != NULL) {
             XFreeColormap(display, display->screens->cmap);
         }
         ckfree((char *) display->screens);
@@ -934,6 +943,14 @@ Tk_TranslateWinEvent(hwnd, message, wParam, lParam, resultPtr)
 		    (short) HIWORD(lParam));
 	    return 1;
 
+	/* Added by RH 27-2-2006: 
+		support for saving changes before logout of shutdown of system */
+
+	case WM_DISPLAYCHANGE:
+	case WM_QUERYENDSESSION:
+		return (!CanExitApplication(hwnd, message, wParam, lParam));
+	/* End added by RH */
+
 	case WM_CLOSE:
 	case WM_SETFOCUS:
 	case WM_KILLFOCUS:
@@ -985,7 +1002,7 @@ GenerateXEvent(hwnd, message, wParam, lParam)
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *)
 	    Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    if (!winPtr || winPtr->window == None) {
+    if (!winPtr || winPtr->window == NULL) {
 	return;
     }
 
@@ -1113,7 +1130,7 @@ GenerateXEvent(hwnd, message, wParam, lParam)
 
 	    event.xbutton.root = RootWindow(winPtr->display,
 		    winPtr->screenNum);
-	    event.xbutton.subwindow = None;
+	    event.xbutton.subwindow = NULL;
 	    event.xbutton.x = clientPoint.x;
 	    event.xbutton.y = clientPoint.y;
 	    event.xbutton.x_root = rootPoint.x;
@@ -1601,7 +1618,7 @@ HandleIMEComposition(hwnd, lParam)
             event.xkey.display = winPtr->display;
             event.xkey.window = winPtr->window;
 	    event.xkey.root = RootWindow(winPtr->display, winPtr->screenNum);
-	    event.xkey.subwindow = None;
+	    event.xkey.subwindow = NULL;
 	    event.xkey.state = TkWinGetModifierState();
 	    event.xkey.time = TkpGetMS();
 	    event.xkey.same_screen = True;
@@ -1866,3 +1883,46 @@ Tk_SetCaretPos(Tk_Window tkwin, int x, int y, int height)
 	}
     }
 }
+
+/* Added by RH 25-8-1999: 
+	support for saving changes before logout of shutdown of system */
+static LRESULT CanExitApplication(hwnd, message, wParam, lParam) 
+    HWND hwnd;
+    UINT message;
+    WPARAM wParam;
+    LPARAM lParam;
+{
+	TkWindow *winPtr = NULL;
+	TkWinDrawable *twdPtr = NULL;
+	TkMainInfo *mainPtr = NULL;
+	TkWindow *mainWinPtr = NULL;
+	Tcl_Interp *interp = NULL;
+	Tcl_CmdInfo cmdInfoPtr;
+	int return_value = 0;
+
+	/* Check if the command "can_exit_application" exists */
+	if (!Tcl_GetCommandInfo(interp, "can_exit_application", &cmdInfoPtr)) {
+		return DefWindowProc(hwnd, message, wParam, lParam);
+	}
+	winPtr = (TkWindow *) Tk_HWNDToWindow(hwnd);
+	if (winPtr != NULL) {
+		mainPtr = winPtr->mainPtr;
+		if (mainPtr != NULL) {
+			mainWinPtr = mainPtr->winPtr;
+			interp = mainPtr->interp;
+			if ((interp != NULL) && (winPtr == mainWinPtr)) {
+				if (Tcl_Eval(interp, "can_exit_application") == 
+					TCL_OK) {
+					sscanf(interp->result, "%d", &return_value);
+					if (return_value) {
+						return TRUE;
+					} else {
+						return FALSE;
+					}
+				}
+			}
+		}
+	}
+	return DefWindowProc(hwnd, message, wParam, lParam);
+}
+/* End added */

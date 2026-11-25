@@ -70,7 +70,7 @@ the build instructions.
 #		Sets where to install Tcl from the built binaries.
 #		C:\Progra~1\Tcl is assumed when not specified.
 #
-#	OPTS=static,msvcrt,linkexten,threads,symbols,profile,none
+#	OPTS=static,msvcrt,linkexten,threads,symbols,pdbs,profile,none
 #		Sets special options for the core.  The default is for none.
 #		Any combination of the above may be used (comma separated).
 #		'none' will over-ride everything to nothing.
@@ -86,6 +86,8 @@ the build instructions.
 #		threads =  Turns on full multithreading support.
 #		thrdalloc = Use the thread allocator (shared global free pool).
 #		symbols =  Adds symbols for step debugging.
+#		pdbs	=  Build a release version with a program database
+#			   (.pdb) for each binary.
 #		profile =  Adds profiling hooks.  Map file is assumed.
 #		loimpact =  Adds a flag for how NT treats the heap to keep memory
 #			   in use, low.  This is said to impact alloc performance.
@@ -159,7 +161,7 @@ Please `cd` to its location first.
 PROJECT	= tk
 !include "rules.vc"
 
-!if $(TCLINSTALL)
+!if $(TCLINSTALL) && !exist("$(_TCLDIR)\win\coffbase.txt")
 !message *** Warning: Tk requires the source distribution of Tcl to build from,
 !message ***    at this time, sorry.  Please set the TCLDIR macro to point to the
 !message ***    Tcl sources.
@@ -356,16 +358,20 @@ cdebug	= -O2 $(OPTIMIZATIONS)
 !else
 cdebug	=
 !endif
-!else if "$(MACHINE)" == "IA64" || "$(MACHINE)" == "AMD64"
-### Warnings are too many, can't support warnings into errors.
-cdebug	= -Zi -Od $(DEBUGFLAGS)
+!if $(SYMBOLS)
+cdebug	= $(cdebug) -Zi
+!endif
 !else
-cdebug	= -Zi -WX $(DEBUGFLAGS)
+### Warnings are too many, can't support warnings into errors. With current
+### compilers and SDKs this holds for IX86 as well.
+cdebug	= -Zi -Od $(DEBUGFLAGS)
 !endif
 
 ### Declarations common to all compiler options
 cwarn = -D _CRT_SECURE_NO_DEPRECATE -D _CRT_NONSTDC_NO_DEPRECATE
-cflags = -nologo -c $(COMPILERFLAGS) $(cwarn) -Fp$(TMP_DIR)^\
+### -Fd: the compiler's program database goes with the objects, not in the
+### current directory that all builds share.
+cflags = -nologo -c $(COMPILERFLAGS) $(cwarn) -Fp$(TMP_DIR)\ -Fd$(TMP_DIR)^\
 
 !if $(FULLWARNINGS)
 cflags = $(cflags) -W4
@@ -401,6 +407,9 @@ WISH_CFLAGS	= $(BASE_CFLAGS) $(TK_DEFINES)
 ldebug	= -debug -debugtype:cv
 !else
 ldebug	= -release -opt:ref -opt:icf,3
+!if $(SYMBOLS)
+ldebug	= $(ldebug) -debug -debugtype:cv
+!endif
 !endif
 
 ### Declarations common to all linker options
@@ -713,13 +722,18 @@ $(TMP_DIR)\winMain.obj: $(WINDIR)\winMain.c
 
 # The following objects are part of the stub library and should not
 # be built as DLL objects but none of the symbols should be exported
-# and no reference made to a C runtime.
+# and no reference made to a C runtime. -Z7 instead of -Zi keeps the debug
+# information in the objects, so that programs linking the stub library do
+# not look for the compiler's program database (LNK4099). Without -GL, so
+# that it can be linked by other compiler versions too (C1047).
+
+STUB_CDEBUG = $(cdebug:-Zi=-Z7)
 
 $(TMP_DIR)\tkStubLib.obj : $(GENERICDIR)\tkStubLib.c
-	$(cc32) $(cdebug) $(cflags) $(TK_INCLUDES) -Zl -DSTATIC_BUILD -Fo$@ $?
+	$(cc32) $(STUB_CDEBUG:-GL=) $(cflags) $(TK_INCLUDES) -Zl -DSTATIC_BUILD -Fo$@ $?
 
 $(TMP_DIR)\tkStubImg.obj : $(GENERICDIR)\tkStubImg.c
-	$(cc32) $(cdebug) $(cflags) $(TK_INCLUDES) -Zl -DSTATIC_BUILD -Fo$@ $?
+	$(cc32) $(STUB_CDEBUG:-GL=) $(cflags) $(TK_INCLUDES) -Zl -DSTATIC_BUILD -Fo$@ $?
 
 
 #---------------------------------------------------------------------
@@ -738,7 +752,7 @@ set f [open {$(WINDIR:\=/)/wish.exe.manifest.in} r]
 set data [read $$f]
 close $$f
 set mach {$(MACHINE)}
-if {[regexp -nocase {$(IX86)$$} $mach ]} {set mach X86}
+if {[string equal -nocase $$mach IX86]} {set mach X86} elseif {[string equal -nocase $$mach AMD64]} {set mach amd64}
 set winver "$(DOTVERSION).0.0"
 set data [string map [list @MACHINE@ $$mach @TK_WIN_VERSION@ $$winver] $$data]
 puts {Creating $(TMP_DIR:\=/)/wish.exe.manifest}

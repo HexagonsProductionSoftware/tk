@@ -38,7 +38,7 @@ typedef struct TkColor {
 				 * value COLOR_MAGIC. */
     GC gc;			/* Simple gc with this color as foreground
 				 * color and all other fields defaulted.
-				 * May be None. */
+				 * May be NULL. */
     Screen *screen;		/* Screen where this color is valid.  Used
 				 * to delete it, and to find its display. */
     Colormap colormap;		/* Colormap from which this entry was

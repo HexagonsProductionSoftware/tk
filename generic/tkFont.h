@@ -187,6 +187,12 @@ typedef struct TkXLFDAttributes {
 #define XLFD_NUMFIELDS	    13	/* Number of fields in XLFD. */
 
 /*
+ * Helper macro. How to correctly round a double to a short.
+ */
+
+#define ROUND16(x)	((short) floor((x) + 0.5))
+
+/*
  * Low-level API exported by generic code to platform-specific code.
  */
 

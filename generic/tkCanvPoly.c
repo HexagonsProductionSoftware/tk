@@ -284,10 +284,10 @@ CreatePolygon(interp, canvas, itemPtr, objc, objv)
     polyPtr->fillColor = NULL;
     polyPtr->activeFillColor = NULL;
     polyPtr->disabledFillColor = NULL;
-    polyPtr->fillStipple = None;
-    polyPtr->activeFillStipple = None;
-    polyPtr->disabledFillStipple = None;
-    polyPtr->fillGC = None;
+    polyPtr->fillStipple = NULL;
+    polyPtr->activeFillStipple = NULL;
+    polyPtr->disabledFillStipple = NULL;
+    polyPtr->fillGC = NULL;
     polyPtr->smooth = (Tk_SmoothMethod *) NULL;
     polyPtr->splineSteps = 12;
     polyPtr->autoClosed = 0;
@@ -469,9 +469,9 @@ ConfigurePolygon(interp, canvas, itemPtr, objc, objv, flags)
     if (polyPtr->outline.activeWidth > polyPtr->outline.width ||
 	    polyPtr->outline.activeDash.number != 0 ||
 	    polyPtr->outline.activeColor != NULL ||
-	    polyPtr->outline.activeStipple != None ||
+	    polyPtr->outline.activeStipple != NULL ||
 	    polyPtr->activeFillColor != NULL ||
-	    polyPtr->activeFillStipple != None) {
+	    polyPtr->activeFillStipple != NULL) {
 	itemPtr->redraw_flags |= TK_ITEM_STATE_DEPENDANT;
     } else {
 	itemPtr->redraw_flags &= ~TK_ITEM_STATE_DEPENDANT;
@@ -492,9 +492,9 @@ ConfigurePolygon(interp, canvas, itemPtr, objc, objv, flags)
 	mask |= GCCapStyle|GCJoinStyle;
 	newGC = Tk_GetGC(tkwin, mask, &gcValues);
     } else {
-	newGC = None;
+	newGC = NULL;
     }
-    if (polyPtr->outline.gc != None) {
+    if (polyPtr->outline.gc != NULL) {
 	Tk_FreeGC(Tk_Display(tkwin), polyPtr->outline.gc);
     }
     polyPtr->outline.gc = newGC;
@@ -505,24 +505,24 @@ ConfigurePolygon(interp, canvas, itemPtr, objc, objv, flags)
 	if (polyPtr->activeFillColor!=NULL) {
 	    color = polyPtr->activeFillColor;
 	}
-	if (polyPtr->activeFillStipple!=None) {
+	if (polyPtr->activeFillStipple!=NULL) {
 	    stipple = polyPtr->activeFillStipple;
 	}
     } else if (state==TK_STATE_DISABLED) {
 	if (polyPtr->disabledFillColor!=NULL) {
 	    color = polyPtr->disabledFillColor;
 	}
-	if (polyPtr->disabledFillStipple!=None) {
+	if (polyPtr->disabledFillStipple!=NULL) {
 	    stipple = polyPtr->disabledFillStipple;
 	}
     }
 
     if (color == NULL) {
-	newGC = None;
+	newGC = NULL;
     } else {
 	gcValues.foreground = color->pixel;
 	mask = GCForeground;
-	if (stipple != None) {
+	if (stipple != NULL) {
 	    gcValues.stipple = stipple;
 	    gcValues.fill_style = FillStippled;
 	    mask |= GCStipple|GCFillStyle;
@@ -538,7 +538,7 @@ ConfigurePolygon(interp, canvas, itemPtr, objc, objv, flags)
 #endif
 	newGC = Tk_GetGC(tkwin, mask, &gcValues);
     }
-    if (polyPtr->fillGC != None) {
+    if (polyPtr->fillGC != NULL) {
 	Tk_FreeGC(Tk_Display(tkwin), polyPtr->fillGC);
     }
     polyPtr->fillGC = newGC;
@@ -596,16 +596,16 @@ DeletePolygon(canvas, itemPtr, display)
     if (polyPtr->disabledFillColor != NULL) {
 	Tk_FreeColor(polyPtr->disabledFillColor);
     }
-    if (polyPtr->fillStipple != None) {
+    if (polyPtr->fillStipple != NULL) {
 	Tk_FreeBitmap(display, polyPtr->fillStipple);
     }
-    if (polyPtr->activeFillStipple != None) {
+    if (polyPtr->activeFillStipple != NULL) {
 	Tk_FreeBitmap(display, polyPtr->activeFillStipple);
     }
-    if (polyPtr->disabledFillStipple != None) {
+    if (polyPtr->disabledFillStipple != NULL) {
 	Tk_FreeBitmap(display, polyPtr->disabledFillStipple);
     }
-    if (polyPtr->fillGC != None) {
+    if (polyPtr->fillGC != NULL) {
 	Tk_FreeGC(display, polyPtr->fillGC);
     }
 }
@@ -710,7 +710,7 @@ ComputePolygonBbox(canvas, polyPtr)
 	}
     }
 
-    if (polyPtr->outline.gc != None) {
+    if (polyPtr->outline.gc != NULL) {
 	tsoffset = &polyPtr->outline.tsoffset;
 	if (tsoffset) {
 	    if (tsoffset->flags & TK_OFFSET_INDEX) {
@@ -821,7 +821,7 @@ TkFillPolygon(canvas, coordPtr, numPoints, display, drawable, gc, outlineGC)
     Drawable drawable;			/* Pixmap or window in which to draw
 					 * polygon. */
     GC gc;				/* Graphics context for drawing. */
-    GC outlineGC;			/* If not None, use this to draw an
+    GC outlineGC;			/* If not NULL, use this to draw an
 					 * outline around the polygon after
 					 * filling it. */
 {
@@ -852,11 +852,11 @@ TkFillPolygon(canvas, coordPtr, numPoints, display, drawable, gc, outlineGC)
      * allocated.
      */
 
-    if (gc != None && numPoints>3) {
+    if (gc != NULL && numPoints>3) {
 	XFillPolygon(display, drawable, gc, pointPtr, numPoints, Complex,
 		CoordModeOrigin);
     }
-    if (outlineGC != None) {
+    if (outlineGC != NULL) {
 	XDrawLines(display, drawable, outlineGC, pointPtr,
 	    numPoints, CoordModeOrigin);
     }
@@ -898,9 +898,9 @@ DisplayPolygon(canvas, itemPtr, display, drawable, x, y, width, height)
     Pixmap stipple = polyPtr->fillStipple;
     double linewidth = polyPtr->outline.width;
 
-    if (((polyPtr->fillGC == None) && (polyPtr->outline.gc == None)) ||
+    if (((polyPtr->fillGC == NULL) && (polyPtr->outline.gc == NULL)) ||
 	    (polyPtr->numPoints < 1) ||
-	    (polyPtr->numPoints < 3 && polyPtr->outline.gc == None)) {
+	    (polyPtr->numPoints < 3 && polyPtr->outline.gc == NULL)) {
 	return;
     }
 
@@ -911,14 +911,14 @@ DisplayPolygon(canvas, itemPtr, display, drawable, x, y, width, height)
 	if (polyPtr->outline.activeWidth>linewidth) {
 	    linewidth = polyPtr->outline.activeWidth;
 	}
-	if (polyPtr->activeFillStipple != None) {
+	if (polyPtr->activeFillStipple != NULL) {
 	    stipple = polyPtr->activeFillStipple;
 	}
     } else if (state==TK_STATE_DISABLED) {
 	if (polyPtr->outline.disabledWidth>0.0) {
 	    linewidth = polyPtr->outline.disabledWidth;
 	}
-	if (polyPtr->disabledFillStipple != None) {
+	if (polyPtr->disabledFillStipple != NULL) {
 	    stipple = polyPtr->disabledFillStipple;
 	}
     }
@@ -928,7 +928,7 @@ DisplayPolygon(canvas, itemPtr, display, drawable, x, y, width, height)
      * read-only.
      */
 
-    if ((stipple != None) && (polyPtr->fillGC != None)) {
+    if ((stipple != NULL) && (polyPtr->fillGC != NULL)) {
 	Tk_TSOffset *tsoffset = &polyPtr->tsoffset;
 	int w=0; int h=0;
 	int flags = tsoffset->flags;
@@ -990,11 +990,11 @@ DisplayPolygon(canvas, itemPtr, display, drawable, x, y, width, height)
 	numPoints = polyPtr->smooth->coordProc(canvas, polyPtr->coordPtr,
 		polyPtr->numPoints, polyPtr->splineSteps, pointPtr,
 		(double *) NULL);
-	if (polyPtr->fillGC != None) {
+	if (polyPtr->fillGC != NULL) {
 	    XFillPolygon(display, drawable, polyPtr->fillGC, pointPtr,
 		    numPoints, Complex, CoordModeOrigin);
 	}
-	if (polyPtr->outline.gc != None) {
+	if (polyPtr->outline.gc != NULL) {
 	    XDrawLines(display, drawable, polyPtr->outline.gc, pointPtr,
 		    numPoints, CoordModeOrigin);
 	}
@@ -1003,7 +1003,7 @@ DisplayPolygon(canvas, itemPtr, display, drawable, x, y, width, height)
 	}
     }
     Tk_ResetOutlineGC(canvas, itemPtr, &(polyPtr->outline));
-    if ((stipple != None) && (polyPtr->fillGC != None)) {
+    if ((stipple != NULL) && (polyPtr->fillGC != NULL)) {
 	XSetTSOrigin(display, polyPtr->fillGC, 0, 0);
     }
 }
@@ -1290,7 +1290,7 @@ PolygonToPoint(canvas, itemPtr, pointPtr)
     if (bestDist<=0.0) {
 	goto donepoint;
     }
-    if ((polyPtr->outline.gc != None) && (polyPtr->joinStyle == JoinRound)) {
+    if ((polyPtr->outline.gc != NULL) && (polyPtr->joinStyle == JoinRound)) {
 	dist = bestDist - radius;
 	if (dist <= 0.0) {
 	    bestDist = 0.0;
@@ -1300,7 +1300,7 @@ PolygonToPoint(canvas, itemPtr, pointPtr)
 	}
     }
 
-    if ((polyPtr->outline.gc == None) || (width <= 1)) goto donepoint;
+    if ((polyPtr->outline.gc == NULL) || (width <= 1)) goto donepoint;
 
     /*
      * The overall idea is to iterate through all of the edges of
@@ -1505,7 +1505,7 @@ PolygonToArea(canvas, itemPtr, rectPtr)
     inside = TkPolygonToArea(polyPoints, numPoints, rectPtr);
     if (inside==0) goto donearea;
 
-    if (polyPtr->outline.gc == None) goto donearea ;
+    if (polyPtr->outline.gc == NULL) goto donearea ;
 
     /*
      * Iterate through all of the edges of the line, computing a polygon
@@ -1832,13 +1832,13 @@ PolygonToPostscript(interp, canvas, itemPtr, prepass)
 	if (polyPtr->outline.activeColor!=NULL) {
 	    color = polyPtr->outline.activeColor;
 	}
-	if (polyPtr->outline.activeStipple!=None) {
+	if (polyPtr->outline.activeStipple!=NULL) {
 	    stipple = polyPtr->outline.activeStipple;
 	}
 	if (polyPtr->activeFillColor!=NULL) {
 	    fillColor = polyPtr->activeFillColor;
 	}
-	if (polyPtr->activeFillStipple!=None) {
+	if (polyPtr->activeFillStipple!=NULL) {
 	    fillStipple = polyPtr->activeFillStipple;
 	}
     } else if (state==TK_STATE_DISABLED) {
@@ -1848,13 +1848,13 @@ PolygonToPostscript(interp, canvas, itemPtr, prepass)
 	if (polyPtr->outline.disabledColor!=NULL) {
 	    color = polyPtr->outline.disabledColor;
 	}
-	if (polyPtr->outline.disabledStipple!=None) {
+	if (polyPtr->outline.disabledStipple!=NULL) {
 	    stipple = polyPtr->outline.disabledStipple;
 	}
 	if (polyPtr->disabledFillColor!=NULL) {
 	    fillColor = polyPtr->disabledFillColor;
 	}
-	if (polyPtr->disabledFillStipple!=None) {
+	if (polyPtr->disabledFillStipple!=NULL) {
 	    fillStipple = polyPtr->disabledFillStipple;
 	}
     }
@@ -1872,7 +1872,7 @@ PolygonToPostscript(interp, canvas, itemPtr, prepass)
 	if (Tk_CanvasPsColor(interp, canvas, color) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	if (stipple != None) {
+	if (stipple != NULL) {
 	    Tcl_AppendResult(interp, "clip ", (char *) NULL);
 	    if (Tk_CanvasPsStipple(interp, canvas, stipple) != TCL_OK) {
 		return TCL_ERROR;
@@ -1898,7 +1898,7 @@ PolygonToPostscript(interp, canvas, itemPtr, prepass)
 	if (Tk_CanvasPsColor(interp, canvas, fillColor) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	if (fillStipple != None) {
+	if (fillStipple != NULL) {
 	    Tcl_AppendResult(interp, "eoclip ", (char *) NULL);
 	    if (Tk_CanvasPsStipple(interp, canvas, fillStipple)
 		    != TCL_OK) {

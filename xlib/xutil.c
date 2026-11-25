@@ -9,6 +9,9 @@
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
+#include "tkInt.h"
+
+/*
 #include <stdlib.h>
 #include <tk.h>
 

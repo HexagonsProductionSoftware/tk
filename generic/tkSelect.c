@@ -135,7 +135,7 @@ Tk_CreateSelHandler(tkwin, selection, target, proc, clientData, format)
     register TkSelHandler *selPtr;
     TkWindow *winPtr = (TkWindow *) tkwin;
 
-    if (winPtr->dispPtr->multipleAtom == None) {
+    if (winPtr->dispPtr->multipleAtom == NULL) {
 	TkSelInit(tkwin);
     }
 
@@ -370,7 +370,7 @@ Tk_OwnSelection(tkwin, selection, proc, clientData)
 					 * prevent compiler warning. */
     
     
-    if (dispPtr->multipleAtom == None) {
+    if (dispPtr->multipleAtom == NULL) {
 	TkSelInit(tkwin);
     }
     Tk_MakeWindowExist(tkwin);
@@ -478,7 +478,7 @@ Tk_ClearSelection(tkwin, selection)
     ClientData clearData = NULL;	/* Initialization needed only to
 					 * prevent compiler warning. */
 
-    if (dispPtr->multipleAtom == None) {
+    if (dispPtr->multipleAtom == NULL) {
 	TkSelInit(tkwin);
     }
 
@@ -501,7 +501,7 @@ Tk_ClearSelection(tkwin, selection)
 	clearData = infoPtr->clearData;
 	ckfree((char *) infoPtr);
     }
-    XSetSelectionOwner(winPtr->display, selection, None, CurrentTime);
+    XSetSelectionOwner(winPtr->display, selection, NULL, CurrentTime);
 
     if (clearProc != NULL) {
 	(*clearProc)(clearData);
@@ -571,7 +571,7 @@ Tk_GetSelection(interp, tkwin, selection, target, proc, clientData)
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
             Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    if (dispPtr->multipleAtom == None) {
+    if (dispPtr->multipleAtom == NULL) {
 	TkSelInit(tkwin);
     }
 

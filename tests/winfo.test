@@ -127,7 +127,8 @@ test winfo-4.3 {"winfo containing" command} {
 test winfo-4.4 {"winfo containing" command} {
     list [catch {winfo containing -displayof geek 25 30} msg] $msg
 } {1 {bad window path name "geek"}}
-test winfo-4.5 {"winfo containing" command} {
+# nonPortable (like 4.6): another window on the desktop can lie over .t.f.
+test winfo-4.5 {"winfo containing" command} {nonPortable} {
     winfo containing [winfo rootx .t.f] [winfo rooty .t.f]
 } .t.f
 test winfo-4.6 {"winfo containing" command} {nonPortable} {

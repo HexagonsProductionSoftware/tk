@@ -2287,7 +2287,7 @@ ImgPhotoConfigureInstance(instancePtr)
      * pixmap for us.
      */
 
-    if ((instancePtr->pixels == None) || (instancePtr->error == NULL)
+    if ((instancePtr->pixels == NULL) || (instancePtr->error == NULL)
 	    || (instancePtr->width != masterPtr->width)
 	    || (instancePtr->height != masterPtr->height)) {
 	ImgPhotoInstanceSetSize(instancePtr);
@@ -2408,7 +2408,7 @@ ImgPhotoGet(tkwin, masterData)
     Tk_PreserveColormap(instancePtr->display, instancePtr->colormap);
     instancePtr->refCount = 1;
     instancePtr->colorTablePtr = NULL;
-    instancePtr->pixels = None;
+    instancePtr->pixels = NULL;
     instancePtr->error = NULL;
     instancePtr->width = 0;
     instancePtr->height = 0;
@@ -2757,7 +2757,7 @@ ImgPhotoDisplay(clientData, display, drawable, imageX, imageY, width,
      * while creating the image instance so it can't be displayed.
      */
 
-    if (instancePtr->pixels == None) {
+    if (instancePtr->pixels == NULL) {
 	return;
     }
 
@@ -2817,7 +2817,7 @@ ImgPhotoDisplay(clientData, display, drawable, imageX, imageY, width,
 	XCopyArea(display, instancePtr->pixels, drawable, instancePtr->gc,
 	          imageX, imageY, (unsigned) width, (unsigned) height,
 	          drawableX, drawableY);
-	XSetClipMask(display, instancePtr->gc, None);
+	XSetClipMask(display, instancePtr->gc, NULL);
 	XSetClipOrigin(display, instancePtr->gc, 0, 0);
     }
     XFlush (display);
@@ -3174,7 +3174,7 @@ ImgPhotoInstanceSetSize(instancePtr)
 
     if ((instancePtr->width != masterPtr->width)
 	    || (instancePtr->height != masterPtr->height)
-	    || (instancePtr->pixels == None)) {
+	    || (instancePtr->pixels == NULL)) {
 	newPixmap = Tk_GetPixmap(instancePtr->display,
 		RootWindow(instancePtr->display,
 		    instancePtr->visualInfo.screen),
@@ -3197,7 +3197,7 @@ ImgPhotoInstanceSetSize(instancePtr)
 
 	TkSetPixmapColormap(newPixmap, instancePtr->colormap);
 
-	if (instancePtr->pixels != None) {
+	if (instancePtr->pixels != NULL) {
 	    /*
 	     * Copy any common pixels from the old pixmap and free it.
 	     */
@@ -3987,10 +3987,10 @@ DisposeInstance(clientData)
     PhotoInstance *instancePtr = (PhotoInstance *) clientData;
     PhotoInstance *prevPtr;
 
-    if (instancePtr->pixels != None) {
+    if (instancePtr->pixels != NULL) {
 	Tk_FreePixmap(instancePtr->display, instancePtr->pixels);
     }
-    if (instancePtr->gc != None) {
+    if (instancePtr->gc != NULL) {
 	Tk_FreeGC(instancePtr->display, instancePtr->gc);
     }
     if (instancePtr->imagePtr != NULL) {

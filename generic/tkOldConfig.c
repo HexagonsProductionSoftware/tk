@@ -452,16 +452,16 @@ DoConfig(interp, tkwin, specPtr, value, valueIsUid, widgRec)
 		Pixmap new, old;
 
 		if (nullValue) {
-		    new = None;
+		    new = NULL;
 	        } else {
 		    uid = valueIsUid ? (Tk_Uid) value : Tk_GetUid(value);
 		    new = Tk_GetBitmap(interp, tkwin, uid);
-		    if (new == None) {
+		    if (new == NULL) {
 			return TCL_ERROR;
 		    }
 		}
 		old = *((Pixmap *) ptr);
-		if (old != None) {
+		if (old != NULL) {
 		    Tk_FreeBitmap(Tk_Display(tkwin), old);
 		}
 		*((Pixmap *) ptr) = new;
@@ -497,16 +497,16 @@ DoConfig(interp, tkwin, specPtr, value, valueIsUid, widgRec)
 		Tk_Cursor new, old;
 
 		if (nullValue) {
-		    new = None;
+		    new = NULL;
 		} else {
 		    uid = valueIsUid ? (Tk_Uid) value : Tk_GetUid(value);
 		    new = Tk_GetCursor(interp, tkwin, uid);
-		    if (new == None) {
+		    if (new == NULL) {
 			return TCL_ERROR;
 		    }
 		}
 		old = *((Tk_Cursor *) ptr);
-		if (old != None) {
+		if (old != NULL) {
 		    Tk_FreeCursor(Tk_Display(tkwin), old);
 		}
 		*((Tk_Cursor *) ptr) = new;
@@ -840,7 +840,7 @@ FormatConfigValue(interp, tkwin, specPtr, widgRec, buffer, freeProcPtr)
 	}
 	case TK_CONFIG_BITMAP: {
 	    Pixmap pixmap = *((Pixmap *) ptr);
-	    if (pixmap != None) {
+	    if (pixmap != NULL) {
 		result = Tk_NameOfBitmap(Tk_Display(tkwin), pixmap);
 	    }
 	    break;
@@ -858,7 +858,7 @@ FormatConfigValue(interp, tkwin, specPtr, widgRec, buffer, freeProcPtr)
 	case TK_CONFIG_CURSOR:
 	case TK_CONFIG_ACTIVE_CURSOR: {
 	    Tk_Cursor cursor = *((Tk_Cursor *) ptr);
-	    if (cursor != None) {
+	    if (cursor != NULL) {
 		result = Tk_NameOfCursor(Tk_Display(tkwin), cursor);
 	    }
 	    break;
@@ -1027,9 +1027,9 @@ Tk_FreeOptions(specs, widgRec, display, needFlags)
 		*((Tk_Font *) ptr) = NULL;
 		break;
 	    case TK_CONFIG_BITMAP:
-		if (*((Pixmap *) ptr) != None) {
+		if (*((Pixmap *) ptr) != NULL) {
 		    Tk_FreeBitmap(display, *((Pixmap *) ptr));
-		    *((Pixmap *) ptr) = None;
+		    *((Pixmap *) ptr) = NULL;
 		}
 		break;
 	    case TK_CONFIG_BORDER:
@@ -1040,9 +1040,9 @@ Tk_FreeOptions(specs, widgRec, display, needFlags)
 		break;
 	    case TK_CONFIG_CURSOR:
 	    case TK_CONFIG_ACTIVE_CURSOR:
-		if (*((Tk_Cursor *) ptr) != None) {
+		if (*((Tk_Cursor *) ptr) != NULL) {
 		    Tk_FreeCursor(display, *((Tk_Cursor *) ptr));
-		    *((Tk_Cursor *) ptr) = None;
+		    *((Tk_Cursor *) ptr) = NULL;
 		}
 	}
     }

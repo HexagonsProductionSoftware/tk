@@ -412,9 +412,9 @@ Tk_CanvasObjCmd(clientData, interp, argc, argv)
     canvasPtr->highlightBgColorPtr = NULL;
     canvasPtr->highlightColorPtr = NULL;
     canvasPtr->inset = 0;
-    canvasPtr->pixmapGC = None;
-    canvasPtr->width = None;
-    canvasPtr->height = None;
+    canvasPtr->pixmapGC = NULL;
+    canvasPtr->width = NULL;
+    canvasPtr->height = NULL;
     canvasPtr->confine = 0;
     canvasPtr->textInfo.selBorder = NULL;
     canvasPtr->textInfo.selBorderWidth = 0;
@@ -458,7 +458,7 @@ Tk_CanvasObjCmd(clientData, interp, argc, argv)
     canvasPtr->scanYOrigin = 0;
     canvasPtr->hotPtr = NULL;
     canvasPtr->hotPrevPtr = NULL;
-    canvasPtr->cursor = None;
+    canvasPtr->cursor = NULL;
     canvasPtr->takeFocus = NULL;
     canvasPtr->pixelsPerMM = WidthOfScreen(Tk_Screen(new));
     canvasPtr->pixelsPerMM /= WidthMMOfScreen(Tk_Screen(new));
@@ -1980,7 +1980,7 @@ DestroyCanvas(memPtr)
      */
 
     Tcl_DeleteHashTable(&canvasPtr->idTable);
-    if (canvasPtr->pixmapGC != None) {
+    if (canvasPtr->pixmapGC != NULL) {
 	Tk_FreeGC(canvasPtr->display, canvasPtr->pixmapGC);
     }
 #ifndef USE_OLD_TAG_SEARCH
@@ -2057,7 +2057,7 @@ ConfigureCanvas(interp, canvasPtr, objc, objv, flags)
     gcValues.foreground = Tk_3DBorderColor(canvasPtr->bgBorder)->pixel;
     new = Tk_GetGC(canvasPtr->tkwin,
 	    GCFunction|GCGraphicsExposures|GCForeground, &gcValues);
-    if (canvasPtr->pixmapGC != None) {
+    if (canvasPtr->pixmapGC != NULL) {
 	Tk_FreeGC(canvasPtr->display, canvasPtr->pixmapGC);
     }
     canvasPtr->pixmapGC = new;
@@ -2522,7 +2522,7 @@ CanvasEventProc(clientData, eventPtr)
 		itemPtr = itemPtr->nextPtr) {
 	    if (itemPtr->typePtr->alwaysRedraw & 1) {
 		(*itemPtr->typePtr->displayProc)((Tk_Canvas) canvasPtr,
-			itemPtr, canvasPtr->display, None, 0, 0, 0, 0);
+			itemPtr, canvasPtr->display, NULL, 0, 0, 0, 0);
 	    }
 	}
     }
@@ -4685,7 +4685,7 @@ PickCurrentItem(canvasPtr, eventPtr)
 	    canvasPtr->pickEvent.xcrossing.display = eventPtr->xmotion.display;
 	    canvasPtr->pickEvent.xcrossing.window = eventPtr->xmotion.window;
 	    canvasPtr->pickEvent.xcrossing.root = eventPtr->xmotion.root;
-	    canvasPtr->pickEvent.xcrossing.subwindow = None;
+	    canvasPtr->pickEvent.xcrossing.subwindow = NULL;
 	    canvasPtr->pickEvent.xcrossing.time = eventPtr->xmotion.time;
 	    canvasPtr->pickEvent.xcrossing.x = eventPtr->xmotion.x;
 	    canvasPtr->pickEvent.xcrossing.y = eventPtr->xmotion.y;

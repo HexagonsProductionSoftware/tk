@@ -817,7 +817,7 @@ DrawMenuEntryLabel(menuPtr, mePtr, d, gc, tkfont, fmPtr, x, y, width, height)
 		    imageHeight, d, leftEdge + imageXOffset,
 		    (int) (y + (mePtr->height - imageHeight)/2 + imageYOffset));
     	}
-    } else if (mePtr->bitmapPtr != None) {
+    } else if (mePtr->bitmapPtr != NULL) {
 	Pixmap bitmap = Tk_GetBitmapFromObj(menuPtr->tkwin, mePtr->bitmapPtr);
 	XCopyPlane(menuPtr->display, bitmap, d,	gc, 0, 0, 
 		(unsigned) imageWidth, (unsigned) imageHeight, 
@@ -842,7 +842,7 @@ DrawMenuEntryLabel(menuPtr, mePtr, d, gc, tkfont, fmPtr, x, y, width, height)
 	    XFillRectangle(menuPtr->display, d, menuPtr->disabledGC, x, y,
 		    (unsigned) width, (unsigned) height);
 	} else if ((mePtr->image != NULL) 
-		&& (menuPtr->disabledImageGC != None)) {
+		&& (menuPtr->disabledImageGC != NULL)) {
 	    XFillRectangle(menuPtr->display, d, menuPtr->disabledImageGC,
 		    leftEdge + imageXOffset,
 		    (int) (y + (mePtr->height - imageHeight)/2 + imageYOffset),

@@ -255,7 +255,7 @@ typedef struct TkDisplay {
 				 * structure for the cursor. */
     char cursorString[20];      /* Used to store a cursor id string. */
     Font cursorFont;		/* Font to use for standard cursors.
-				 * None means font not loaded yet. */
+				 * NULL means font not loaded yet. */
 
     /*
      * Information used by tkError.c only:
@@ -421,7 +421,7 @@ typedef struct TkDisplay {
 				 * records.  Each entry contains information
 				 * about the current owner of a particular
 				 * selection on this display. */
-    Atom multipleAtom;		/* Atom for MULTIPLE.  None means
+    Atom multipleAtom;		/* Atom for MULTIPLE.  NULL means
 				 * selection stuff isn't initialized. */
     Atom incrAtom;		/* Atom for INCR. */
     Atom targetsAtom;		/* Atom for TARGETS. */
@@ -692,6 +692,20 @@ typedef struct {
     int native;			/* 0 means generic (X style) bitmap,
     				 * 1 means native style bitmap. */
 } TkPredefBitmap;
+
+/*
+ * The definition of pi, at least from the perspective of double-precision
+ * floats.
+ */
+// Copied from Tk 8.6: support for angle
+#ifndef PI
+#ifdef M_PI
+#define PI	M_PI
+#else
+#define PI	3.14159265358979323846
+#endif
+#endif
+// End changed
 
 /*
  * Tk keeps one of the following structures for each window.
@@ -1215,6 +1229,10 @@ EXTERN int		TkParsePadAmount _ANSI_ARGS_((Tcl_Interp *interp,
 			    Tk_Window tkwin, Tcl_Obj *objPtr,
 			    int *pad1Ptr, int *pad2Ptr));
 EXTERN int		TkpAlwaysShowSelection _ANSI_ARGS_((Tk_Window tkwin));
+/* Backported from Tk 8.5 (bugs 1813597 and 2218964). */
+EXTERN int		Tk_GetDoublePixelsFromObj _ANSI_ARGS_((
+			    Tcl_Interp *interp, Tk_Window tkwin,
+			    Tcl_Obj *objPtr, double *doublePtr));
 #ifdef __WIN32__
 #define TkParseColor XParseColor
 #else
@@ -1222,6 +1240,21 @@ EXTERN Status TkParseColor _ANSI_ARGS_((Display * display,
 				Colormap map, CONST char* spec,
 				XColor * colorPtr));
 #endif
+
+// Copied from Tk 8.6: support for angle
+EXTERN void	TkDrawAngledTextLayout(Display *display,
+			    Drawable drawable, GC gc, Tk_TextLayout layout,
+			    int x, int y, double angle, int firstChar,
+			    int lastChar);
+EXTERN void	TkpDrawAngledChars(Display *display,Drawable drawable,
+			    GC gc, Tk_Font tkfont, const char *source,
+			    int numBytes, double x, double y, double angle);
+EXTERN void	TkUnderlineAngledTextLayout(Display *display,
+			    Drawable drawable, GC gc, Tk_TextLayout layout,
+			    int x, int y, double angle, int underline);
+EXTERN int	TkIntersectAngledTextLayout(Tk_TextLayout layout,
+			    int x,int y, int width, int height, double angle);
+// End copied
 
 /*
  * Unsupported commands.

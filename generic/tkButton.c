@@ -676,7 +676,7 @@ ButtonCreate(clientData, interp, objc, objv, type)
     butPtr->textPtr = NULL;
     butPtr->underline = -1;
     butPtr->textVarNamePtr = NULL;
-    butPtr->bitmap = None;
+    butPtr->bitmap = NULL;
     butPtr->imagePtr = NULL;
     butPtr->image = NULL;
     butPtr->selectImagePtr = NULL;
@@ -696,12 +696,12 @@ ButtonCreate(clientData, interp, objc, objv, type)
     butPtr->normalFg = NULL;
     butPtr->activeFg = NULL;
     butPtr->disabledFg = NULL;
-    butPtr->normalTextGC = None;
-    butPtr->activeTextGC = None;
-    butPtr->disabledGC = None;
-    butPtr->stippleGC = None;
-    butPtr->gray = None;
-    butPtr->copyGC = None;
+    butPtr->normalTextGC = NULL;
+    butPtr->activeTextGC = NULL;
+    butPtr->disabledGC = NULL;
+    butPtr->stippleGC = NULL;
+    butPtr->gray = NULL;
+    butPtr->copyGC = NULL;
     butPtr->widthPtr = NULL;
     butPtr->width = 0;
     butPtr->heightPtr = NULL;
@@ -725,7 +725,7 @@ ButtonCreate(clientData, interp, objc, objv, type)
     butPtr->selVarNamePtr = NULL;
     butPtr->onValuePtr = NULL;
     butPtr->offValuePtr = NULL;
-    butPtr->cursor = None;
+    butPtr->cursor = NULL;
     butPtr->takeFocusPtr = NULL;
     butPtr->commandPtr = NULL;
     butPtr->flags = 0;
@@ -972,22 +972,22 @@ DestroyButton(butPtr)
     if (butPtr->selectImage != NULL) {
 	Tk_FreeImage(butPtr->selectImage);
     }
-    if (butPtr->normalTextGC != None) {
+    if (butPtr->normalTextGC != NULL) {
 	Tk_FreeGC(butPtr->display, butPtr->normalTextGC);
     }
-    if (butPtr->activeTextGC != None) {
+    if (butPtr->activeTextGC != NULL) {
 	Tk_FreeGC(butPtr->display, butPtr->activeTextGC);
     }
-    if (butPtr->disabledGC != None) {
+    if (butPtr->disabledGC != NULL) {
 	Tk_FreeGC(butPtr->display, butPtr->disabledGC);
     }
-    if (butPtr->stippleGC != None) {
+    if (butPtr->stippleGC != NULL) {
 	Tk_FreeGC(butPtr->display, butPtr->stippleGC);
     }
-    if (butPtr->gray != None) {
+    if (butPtr->gray != NULL) {
 	Tk_FreeBitmap(butPtr->display, butPtr->gray);
     }
-    if (butPtr->copyGC != None) {
+    if (butPtr->copyGC != NULL) {
 	Tk_FreeGC(butPtr->display, butPtr->copyGC);
     }
     if (butPtr->textLayout != NULL) {
@@ -1193,7 +1193,7 @@ ConfigureButton(interp, butPtr, objc, objv)
 	butPtr->selectImage = image;
 
 	haveImage = 0;
-	if (butPtr->imagePtr != NULL || butPtr->bitmap != None) {
+	if (butPtr->imagePtr != NULL || butPtr->bitmap != NULL) {
 	    haveImage = 1;
 	}
 	if ((!haveImage || butPtr->compound != COMPOUND_NONE)
@@ -1223,7 +1223,7 @@ ConfigureButton(interp, butPtr, objc, objv)
 	    }
 	}
     
-	if ((butPtr->bitmap != None) || (butPtr->imagePtr != NULL)) {
+	if ((butPtr->bitmap != NULL) || (butPtr->imagePtr != NULL)) {
 	    /*
 	     * The button must display the contents of an image or
 	     * bitmap.
@@ -1332,7 +1332,7 @@ TkButtonWorldChanged(instanceData)
     gcValues.graphics_exposures = False;
     mask = GCForeground | GCBackground | GCFont | GCGraphicsExposures;
     newGC = Tk_GetGC(butPtr->tkwin, mask, &gcValues);
-    if (butPtr->normalTextGC != None) {
+    if (butPtr->normalTextGC != NULL) {
 	Tk_FreeGC(butPtr->display, butPtr->normalTextGC);
     }
     butPtr->normalTextGC = newGC;
@@ -1342,7 +1342,7 @@ TkButtonWorldChanged(instanceData)
 	gcValues.background = Tk_3DBorderColor(butPtr->activeBorder)->pixel;
 	mask = GCForeground | GCBackground | GCFont;
 	newGC = Tk_GetGC(butPtr->tkwin, mask, &gcValues);
-	if (butPtr->activeTextGC != None) {
+	if (butPtr->activeTextGC != NULL) {
 	    Tk_FreeGC(butPtr->display, butPtr->activeTextGC);
 	}
 	butPtr->activeTextGC = newGC;
@@ -1354,13 +1354,13 @@ TkButtonWorldChanged(instanceData)
      * Create the GC that can be used for stippling
      */
 
-    if (butPtr->stippleGC == None) {
+    if (butPtr->stippleGC == NULL) {
 	gcValues.foreground = gcValues.background;
 	mask = GCForeground;
-	if (butPtr->gray == None) {
+	if (butPtr->gray == NULL) {
 	    butPtr->gray = Tk_GetBitmap(NULL, butPtr->tkwin, "gray50");
 	}
-	if (butPtr->gray != None) {
+	if (butPtr->gray != NULL) {
 	    gcValues.fill_style = FillStippled;
 	    gcValues.stipple = butPtr->gray;
 	    mask |= GCFillStyle | GCStipple;
@@ -1380,12 +1380,12 @@ TkButtonWorldChanged(instanceData)
 	gcValues.foreground = gcValues.background;
     }
     newGC = Tk_GetGC(butPtr->tkwin, mask, &gcValues);
-    if (butPtr->disabledGC != None) {
+    if (butPtr->disabledGC != NULL) {
 	Tk_FreeGC(butPtr->display, butPtr->disabledGC);
     }
     butPtr->disabledGC = newGC;
 
-    if (butPtr->copyGC == None) {
+    if (butPtr->copyGC == NULL) {
 	butPtr->copyGC = Tk_GetGC(butPtr->tkwin, 0, &gcValues);
     }
 

@@ -81,6 +81,22 @@ TkWinGetModifierState()
     if (GetKeyState(VK_RBUTTON) & 0x8000) {
 	state |= Button3Mask;
     }
+	/* Changed by RH 27-2-2006: left and right mouse buttons down = middle button down */
+    if ((GetAsyncKeyState(VK_RBUTTON) & 0x8000) && (GetAsyncKeyState(VK_LBUTTON) & 0x8000)) {
+		state |= Button2Mask;
+	}
+	if (!(state & Button2Mask)) {
+		if (GetKeyState(VK_LBUTTON) & 0x8000) {
+			state |= Button1Mask;
+		}
+		if (GetKeyState(VK_MBUTTON) & 0x8000) {
+			state |= Button2Mask;
+		}
+		if (GetKeyState(VK_RBUTTON) & 0x8000) {
+			state |= Button3Mask;
+		}
+	}
+	/* End changed */
     return state;
 }
 
@@ -391,7 +407,7 @@ XGetInputFocus(display, focus_return, revert_to_return)
     int *revert_to_return;
 {
     Tk_Window tkwin = Tk_HWNDToWindow(GetFocus());
-    *focus_return = tkwin ? Tk_WindowId(tkwin) : None;
+    *focus_return = tkwin ? Tk_WindowId(tkwin) : 0;
     *revert_to_return = RevertToParent;
     display->request++;
     return Success;
@@ -422,7 +438,7 @@ XSetInputFocus(display, focus, revert_to, time)
     Time time;
 {
     display->request++;
-    if (focus != None) {
+    if (focus != NULL) {
 	SetFocus(Tk_GetHWND(focus));
     }
     return Success;
@@ -470,7 +486,7 @@ TkpChangeFocus(winPtr, force)
 	}
     }
 
-    if (winPtr->window == None) {
+    if (winPtr->window == NULL) {
 	panic("ChangeXFocus got null X window");
     }
 

@@ -226,7 +226,7 @@ TkpFreeCursor(cursorPtr)
  *
  * TkpSetCursor --
  *
- *	Set the global cursor.  If the cursor is None, then use the
+ *	Set the global cursor.  If the cursor is NULL, then use the
  *	default Tk cursor.
  *
  * Results:

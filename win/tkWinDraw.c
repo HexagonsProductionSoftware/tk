@@ -647,7 +647,7 @@ XFillRectangles(display, d, gc, rectangles, nrectangles)
 
     if ((gc->fill_style == FillStippled
 	    || gc->fill_style == FillOpaqueStippled)
-	    && gc->stipple != None) {
+	    && gc->stipple != NULL) {
 	TkWinDrawable *twdPtr = (TkWinDrawable *)gc->stipple;
 	HBRUSH stipple;
 	HBITMAP oldBitmap, bitmap;
@@ -762,7 +762,7 @@ RenderObject(dc, gc, points, npoints, mode, pen, func)
 
     if ((gc->fill_style == FillStippled
 	    || gc->fill_style == FillOpaqueStippled)
-	    && gc->stipple != None) {
+	    && gc->stipple != NULL) {
 
 	TkWinDrawable *twdPtr = (TkWinDrawable *)gc->stipple;
 	HDC dcMem;

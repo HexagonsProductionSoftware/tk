@@ -192,7 +192,7 @@ Tk_ScrollbarCmd(clientData, interp, argc, argv)
     scrollPtr->lastUnit = 0;
     scrollPtr->firstFraction = 0.0;
     scrollPtr->lastFraction = 0.0;
-    scrollPtr->cursor = None;
+    scrollPtr->cursor = NULL;
     scrollPtr->takeFocus = NULL;
     scrollPtr->flags = 0;
 

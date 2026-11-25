@@ -305,7 +305,7 @@ RegOpen(interp, dispPtr, lock)
 	    &regPtr->propLength, &bytesAfter,
 	    (unsigned char **) &regPtr->property);
 
-    if (actualType == None) {
+    if (actualType == NULL) {
 	regPtr->propLength = 0;
 	regPtr->property = NULL;
     } else if ((result != Success) || (actualFormat != 8)
@@ -350,7 +350,7 @@ RegOpen(interp, dispPtr, lock)
  *
  * Results:
  *	The return value is the X identifier for the comm window for
- *	the application named "name", or None if there is no such
+ *	the application named "name", or NULL if there is no such
  *	entry in the registry.
  *
  * Side effects:
@@ -388,7 +388,7 @@ RegFindName(regPtr, name)
 	}
 	p++;
     }
-    return None;
+    return NULL;
 }
 
 /*
@@ -618,7 +618,7 @@ ValidateName(dispPtr, name, commWindow, oldOK)
 	    False, XA_STRING, &actualType, &actualFormat,
 	    &length, &bytesAfter, (unsigned char **) &property);
 
-    if ((result == Success) && (actualType == None)) {
+    if ((result == Success) && (actualType == NULL)) {
 	XWindowAttributes atts;
 
 	/*
@@ -825,7 +825,7 @@ Tk_SetAppName(tkwin, name)
 	    sprintf(Tcl_DStringValue(&dString) + offset, "%d", i);
 	}
 	w = RegFindName(regPtr, actualName);
-	if (w == None) {
+	if (w == NULL) {
 	    break;
 	}
     
@@ -1028,7 +1028,7 @@ Tk_SendCmd(clientData, interp, argc, argv)
     regPtr = RegOpen(interp, winPtr->dispPtr, 0);
     commWindow = RegFindName(regPtr, destName);
     RegClose(regPtr);
-    if (commWindow == None) {
+    if (commWindow == NULL) {
 	Tcl_AppendResult(interp, "no application named \"",
 		destName, "\"", (char *) NULL);
 	return TCL_ERROR;
@@ -1207,7 +1207,7 @@ TkGetInterpNames(interp, tkwin)
     for (p = regPtr->property; (p-regPtr->property) < (int) regPtr->propLength; ) {
 	entry = p;
 	if (sscanf(p,  "%x",(unsigned int *) &id) != 1) {
-	    commWindow =  None;
+	    commWindow =  NULL;
 	} else {
 	    commWindow = id;
 	}
@@ -1440,7 +1440,7 @@ SendEventProc(clientData, eventPtr)
 
 	    p += 2;
 	    interpName = NULL;
-	    commWindow = None;
+	    commWindow = NULL;
 	    serial = "";
 	    script = NULL;
 	    while (((p-propInfo) < (int) numItems) && (*p == '-')) {
@@ -1448,7 +1448,7 @@ SendEventProc(clientData, eventPtr)
 		    case 'r':
 			commWindow = (Window) strtoul(p+2, &end, 16);
 			if ((end == p+2) || (*end != ' ')) {
-			    commWindow = None;
+			    commWindow = NULL;
 			} else {
 			    p = serial = end+1;
 			}
@@ -1479,7 +1479,7 @@ SendEventProc(clientData, eventPtr)
 	     * time if we need to return an error.
 	     */
 
-	    if (commWindow != None) {
+	    if (commWindow != NULL) {
 		Tcl_DStringInit(&reply);
 		Tcl_DStringAppend(&reply, "\0r\0-s ", 6);
 		Tcl_DStringAppend(&reply, serial, -1);
@@ -1487,7 +1487,7 @@ SendEventProc(clientData, eventPtr)
 	    }
 
 	    if (!ServerSecure(dispPtr)) {
-		if (commWindow != None) {
+		if (commWindow != NULL) {
 		    Tcl_DStringAppend(&reply, "X server insecure (must use xauth-style authorization); command ignored", -1);
 		}
 		result = TCL_ERROR;
@@ -1500,7 +1500,7 @@ SendEventProc(clientData, eventPtr)
 
 	    for (riPtr = tsdPtr->interpListPtr; ; riPtr = riPtr->nextPtr) {
 		if (riPtr == NULL) {
-		    if (commWindow != None) {
+		    if (commWindow != NULL) {
 			Tcl_DStringAppend(&reply,
 				"receiver never heard of interpreter \"", -1);
 			Tcl_DStringAppend(&reply, interpName, -1);
@@ -1532,7 +1532,7 @@ SendEventProc(clientData, eventPtr)
              * riPtr->interp field to NULL, hence the check below for NULL.
              */
 
-	    if (commWindow != None) {
+	    if (commWindow != NULL) {
 		Tcl_DStringAppend(&reply, Tcl_GetStringResult(remoteInterp),
 			-1);
 		if (result == TCL_ERROR) {
@@ -1563,7 +1563,7 @@ SendEventProc(clientData, eventPtr)
 	     */
 
 	    returnResult:
-	    if (commWindow != None) {
+	    if (commWindow != NULL) {
 		if (result != TCL_OK) {
 		    char buffer[TCL_INTEGER_SPACE];
     

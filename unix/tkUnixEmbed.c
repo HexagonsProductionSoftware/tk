@@ -31,7 +31,7 @@ typedef struct Container {
 					 * in this process. */
     Window wrapper;			/* X's window id for the wrapper
 					 * window for the embedded window.
-					 * Starts off as None, but gets
+					 * Starts off as NULL, but gets
 					 * filled in when the window is
 					 * eventually created. */
     TkWindow *embeddedPtr;		/* Tk's information about the embedded
@@ -112,7 +112,7 @@ TkpUseWindow(interp, tkwin, string)
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
             Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    if (winPtr->window != None) {
+    if (winPtr->window != NULL) {
 	panic("TkUseWindow: X window already assigned");
     }
     if (Tcl_GetInt(interp, string, &id) != TCL_OK) {
@@ -182,7 +182,7 @@ TkpUseWindow(interp, tkwin, string)
 	containerPtr->parent = parent;
 	containerPtr->parentRoot = parentAtts.root;
 	containerPtr->parentPtr = NULL;
-	containerPtr->wrapper = None;
+	containerPtr->wrapper = NULL;
 	containerPtr->nextPtr = tsdPtr->firstContainerPtr;
 	tsdPtr->firstContainerPtr = containerPtr;
     }
@@ -200,7 +200,7 @@ TkpUseWindow(interp, tkwin, string)
  *	current attributes of the specified TkWindow.
  *
  * Results:
- *	Returns the handle to the new window, or None on failure.
+ *	Returns the handle to the new window, or NULL on failure.
  *
  * Side effects:
  *	Creates a new X window.
@@ -286,7 +286,7 @@ TkpMakeContainer(tkwin)
     containerPtr->parent = Tk_WindowId(tkwin);
     containerPtr->parentRoot = RootWindowOfScreen(Tk_Screen(tkwin));
     containerPtr->parentPtr = winPtr;
-    containerPtr->wrapper = None;
+    containerPtr->wrapper = NULL;
     containerPtr->embeddedPtr = NULL;
     containerPtr->nextPtr = tsdPtr->firstContainerPtr;
     tsdPtr->firstContainerPtr = containerPtr;
@@ -509,7 +509,7 @@ EmbedStructureProc(clientData, eventPtr)
     Tk_ErrorHandler errHandler;
 
     if (eventPtr->type == ConfigureNotify) {
-	if (containerPtr->wrapper != None) {
+	if (containerPtr->wrapper != NULL) {
 	    /*
 	     * Ignore errors, since the embedded application could have
 	     * deleted its window.
@@ -568,7 +568,7 @@ EmbedFocusProc(clientData, eventPtr)
 	 * possible that the new focus window isn't mapped).
 	 */
     
-	if (containerPtr->wrapper != None) {
+	if (containerPtr->wrapper != NULL) {
 	    errHandler = Tk_CreateErrorHandler(eventPtr->xfocus.display, -1,
 		    -1, -1, (Tk_ErrorProc *) NULL, (ClientData) NULL);
 	    XSetInputFocus(display, containerPtr->wrapper, RevertToParent,
@@ -665,7 +665,7 @@ EmbedSendConfigure(containerPtr)
     event.xconfigure.y = 0;
     event.xconfigure.width = winPtr->changes.width;
     event.xconfigure.height = winPtr->changes.height;
-    event.xconfigure.above = None;
+    event.xconfigure.above = NULL;
     event.xconfigure.override_redirect = False;
 
     /*
@@ -897,7 +897,7 @@ TkpTestembedCmd(clientData, interp, argc, argv)
     for (containerPtr = tsdPtr->firstContainerPtr; containerPtr != NULL;
 	    containerPtr = containerPtr->nextPtr) {
 	Tcl_DStringStartSublist(&dString);
-	if (containerPtr->parent == None) {
+	if (containerPtr->parent == NULL) {
 	    Tcl_DStringAppendElement(&dString, "");
 	} else {
 	    if (all) {
@@ -913,7 +913,7 @@ TkpTestembedCmd(clientData, interp, argc, argv)
 	    Tcl_DStringAppendElement(&dString,
 		    containerPtr->parentPtr->pathName);
 	}
-	if (containerPtr->wrapper == None) {
+	if (containerPtr->wrapper == NULL) {
 	    Tcl_DStringAppendElement(&dString, "");
 	} else {
 	    if (all) {
@@ -972,7 +972,7 @@ EmbedWindowDeleted(winPtr)
     containerPtr = tsdPtr->firstContainerPtr;
     while (1) {
 	if (containerPtr->embeddedPtr == winPtr) {
-	    containerPtr->wrapper = None;
+	    containerPtr->wrapper = NULL;
 	    containerPtr->embeddedPtr = NULL;
 	    break;
 	}
@@ -1027,5 +1027,5 @@ TkUnixContainerId(winPtr)
 	}
     }
     panic("TkUnixContainerId couldn't find window");
-    return None;
+    return NULL;
 }

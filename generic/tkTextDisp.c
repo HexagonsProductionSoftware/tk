@@ -41,12 +41,12 @@ typedef struct StyleValues {
 				 * NULL means use widget background. */
     int borderWidth;		/* Width of 3-D border for background. */
     int relief;			/* 3-D relief for background. */
-    Pixmap bgStipple;		/* Stipple bitmap for background.  None
+    Pixmap bgStipple;		/* Stipple bitmap for background.  NULL
 				 * means draw solid. */
     XColor *fgColor;		/* Foreground color for text. */
     Tk_Font tkfont;		/* Font for displaying text. */
     Pixmap fgStipple;		/* Stipple bitmap for text and other
-				 * foreground stuff.   None means draw
+				 * foreground stuff.   NULL means draw
 				 * solid.*/
     int justify;		/* Justification style for text. */
     int lMargin1;		/* Left margin, in pixels, for first display
@@ -80,7 +80,7 @@ typedef struct StyleValues {
 typedef struct TextStyle {
     int refCount;		/* Number of times this structure is
 				 * referenced in Chunks. */
-    GC bgGC;			/* Graphics context for background.  None
+    GC bgGC;			/* Graphics context for background.  NULL
 				 * means use widget background. */
     GC fgGC;			/* Graphics context for foreground. */
     StyleValues *sValuePtr;	/* Raw information from which GCs were
@@ -415,7 +415,7 @@ TkTextCreateDInfo(textPtr)
     dInfoPtr = (TextDInfo *) ckalloc(sizeof(TextDInfo));
     Tcl_InitHashTable(&dInfoPtr->styleTable, sizeof(StyleValues)/sizeof(int));
     dInfoPtr->dLinePtr = NULL;
-    dInfoPtr->copyGC = None;
+    dInfoPtr->copyGC = NULL;
     gcValues.graphics_exposures = True;
     dInfoPtr->scrollGC = Tk_GetGC(textPtr->tkwin, GCGraphicsExposures,
 	    &gcValues);
@@ -468,7 +468,7 @@ TkTextFreeDInfo(textPtr)
 
     FreeDLines(textPtr, dInfoPtr->dLinePtr, (DLine *) NULL, 1);
     Tcl_DeleteHashTable(&dInfoPtr->styleTable);
-    if (dInfoPtr->copyGC != None) {
+    if (dInfoPtr->copyGC != NULL) {
 	Tk_FreeGC(textPtr->display, dInfoPtr->copyGC);
     }
     Tk_FreeGC(textPtr->display, dInfoPtr->scrollGC);
@@ -585,20 +585,20 @@ GetStyle(textPtr, indexPtr)
 	    styleValues.relief = tagPtr->relief;
 	    reliefPrio = tagPtr->priority;
 	}
-	if ((tagPtr->bgStipple != None)
+	if ((tagPtr->bgStipple != NULL)
 		&& (tagPtr->priority > bgStipplePrio)) {
 	    styleValues.bgStipple = tagPtr->bgStipple;
 	    bgStipplePrio = tagPtr->priority;
 	}
-	if ((tagPtr->fgColor != None) && (tagPtr->priority > fgPrio)) {
+	if ((tagPtr->fgColor != NULL) && (tagPtr->priority > fgPrio)) {
 	    styleValues.fgColor = tagPtr->fgColor;
 	    fgPrio = tagPtr->priority;
 	}
-	if ((tagPtr->tkfont != None) && (tagPtr->priority > fontPrio)) {
+	if ((tagPtr->tkfont != NULL) && (tagPtr->priority > fontPrio)) {
 	    styleValues.tkfont = tagPtr->tkfont;
 	    fontPrio = tagPtr->priority;
 	}
-	if ((tagPtr->fgStipple != None)
+	if ((tagPtr->fgStipple != NULL)
 		&& (tagPtr->priority > fgStipplePrio)) {
 	    styleValues.fgStipple = tagPtr->fgStipple;
 	    fgStipplePrio = tagPtr->priority;
@@ -694,20 +694,20 @@ GetStyle(textPtr, indexPtr)
     if (styleValues.border != NULL) {
 	gcValues.foreground = Tk_3DBorderColor(styleValues.border)->pixel;
 	mask = GCForeground;
-	if (styleValues.bgStipple != None) {
+	if (styleValues.bgStipple != NULL) {
 	    gcValues.stipple = styleValues.bgStipple;
 	    gcValues.fill_style = FillStippled;
 	    mask |= GCStipple|GCFillStyle;
 	}
 	stylePtr->bgGC = Tk_GetGC(textPtr->tkwin, mask, &gcValues);
     } else {
-	stylePtr->bgGC = None;
+	stylePtr->bgGC = NULL;
     }
     mask = GCFont;
     gcValues.font = Tk_FontId(styleValues.tkfont);
     mask |= GCForeground;
     gcValues.foreground = styleValues.fgColor->pixel;
-    if (styleValues.fgStipple != None) {
+    if (styleValues.fgStipple != NULL) {
 	gcValues.stipple = styleValues.fgStipple;
 	gcValues.fill_style = FillStippled;
 	mask |= GCStipple|GCFillStyle;
@@ -747,10 +747,10 @@ FreeStyle(textPtr, stylePtr)
 {
     stylePtr->refCount--;
     if (stylePtr->refCount == 0) {
-	if (stylePtr->bgGC != None) {
+	if (stylePtr->bgGC != NULL) {
 	    Tk_FreeGC(textPtr->display, stylePtr->bgGC);
 	}
-	if (stylePtr->fgGC != None) {
+	if (stylePtr->fgGC != NULL) {
 	    Tk_FreeGC(textPtr->display, stylePtr->fgGC);
 	}
 	Tcl_DeleteHashEntry(stylePtr->hPtr);
@@ -1921,7 +1921,7 @@ DisplayLineBackground(textPtr, dlPtr, prevPtr, pixmap)
 	if ((chunkPtr->nextPtr == NULL) && (rightX < maxX)) {
 	    rightX = maxX;
 	}
-	if (chunkPtr->stylePtr->bgGC != None) {
+	if (chunkPtr->stylePtr->bgGC != NULL) {
 	    /* Not visible - bail out now */
 	    if (rightX + xOffset <= 0) {
 	        leftX = rightX;
@@ -3013,7 +3013,7 @@ TkTextRelayoutWindow(textPtr)
 
     gcValues.graphics_exposures = False;
     new = Tk_GetGC(textPtr->tkwin, GCGraphicsExposures, &gcValues);
-    if (dInfoPtr->copyGC != None) {
+    if (dInfoPtr->copyGC != NULL) {
 	Tk_FreeGC(textPtr->display, dInfoPtr->copyGC);
     }
     dInfoPtr->copyGC = new;
@@ -4692,7 +4692,7 @@ CharDisplayProc(chunkPtr, x, y, height, baseline, display, dst, screenY)
      * Draw the text, underline, and overstrike for this chunk.
      */
 
-    if (!sValuePtr->elide && (ciPtr->numBytes > offsetBytes) && (stylePtr->fgGC != None)) {
+    if (!sValuePtr->elide && (ciPtr->numBytes > offsetBytes) && (stylePtr->fgGC != NULL)) {
 	int numBytes = ciPtr->numBytes - offsetBytes;
 	char *string = ciPtr->chars + offsetBytes;
 

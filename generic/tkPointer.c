@@ -181,13 +181,13 @@ GenerateEnterLeave(winPtr, x, y, state)
 	    TkWindow *targetPtr;
 
 	    if ((lastWinPtr == NULL)
-		|| (lastWinPtr->window == None)) {
+		|| (lastWinPtr->window == NULL)) {
 		targetPtr = winPtr;
 	    } else {
 		targetPtr = lastWinPtr;
 	    }
 
-	    if (targetPtr && (targetPtr->window != None)) {
+	    if (targetPtr && (targetPtr->window != NULL)) {
 		XEvent event;
 
 		/*
@@ -267,7 +267,8 @@ Tk_UpdatePointer(tkwin, x, y, state)
      * between the current button state and the last known button state.
      */
 
-    for (b = Button1; b <= Button3; b++) {
+    /* Changed from Button3 to Button5 by RH 27-2-2006 */
+    for (b = Button1; b <= Button5; b++) {
 	mask = ButtonMask(b);
 	if (changes & mask) {
 	    if (state & mask) {	
@@ -544,7 +545,7 @@ static void
 UpdateCursor(winPtr)
     TkWindow *winPtr;
 {
-    Cursor cursor = None;
+    Cursor cursor = NULL;
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
             Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
@@ -556,7 +557,7 @@ UpdateCursor(winPtr)
 
     tsdPtr->cursorWinPtr = winPtr;
     while (winPtr != NULL) {
-	if (winPtr->atts.cursor != None) {
+	if (winPtr->atts.cursor != NULL) {
 	    cursor = winPtr->atts.cursor;
 	    break;
 	} else if (winPtr->flags & TK_TOP_HIERARCHY) {

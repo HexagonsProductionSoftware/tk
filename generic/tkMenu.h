@@ -64,8 +64,8 @@ typedef struct TkMenuEntry {
 				 * of character to underline (<0 means don't
 				 * underline anything). */
     Tcl_Obj *underlinePtr;	/* Index of character to underline. */
-    Tcl_Obj *bitmapPtr;		/* Bitmap to display in menu entry, or None.
-				 * If not None then label is ignored. */
+    Tcl_Obj *bitmapPtr;		/* Bitmap to display in menu entry, or NULL.
+				 * If not NULL then label is ignored. */
     Tcl_Obj *imagePtr;		/* Name of image to display, or
 				 * NULL.  If non-NULL, bitmap, text, and
 				 * textVarName are ignored. */
@@ -165,7 +165,7 @@ typedef struct TkMenuEntry {
 				 * menu structure.  See comments for
 				 * disabledFg in menu structure for more
 				 * information. */
-    GC indicatorGC;		/* For drawing indicators.  None means use
+    GC indicatorGC;		/* For drawing indicators.  NULL means use
 				 * GC from menu. */
 
     /*
@@ -291,7 +291,7 @@ typedef struct TkMenu {
     Tcl_Obj *indicatorFgPtr;	/* Color for indicators in radio and check
 				 * button entries. */
     Pixmap gray;		/* Bitmap for drawing disabled entries in
-				 * a stippled fashion.  None means not
+				 * a stippled fashion.  NULL means not
 				 * allocated yet. */
     GC textGC;			/* GC for drawing text and other features
 				 * of menu entries. */
@@ -336,7 +336,7 @@ typedef struct TkMenu {
     Tcl_Obj *takeFocusPtr;	/* Value of -takefocus option;  not used in
 				 * the C code, but used by keyboard traversal
 				 * scripts.  Malloc'ed, but may be NULL. */
-    Tcl_Obj *cursorPtr;		/* Current cursor for window, or None. */
+    Tcl_Obj *cursorPtr;		/* Current cursor for window, or NULL. */
     Tcl_Obj *postCommandPtr;	/* Used to detect cycles in cascade hierarchy
     				 * trees when preprocessing postcommands
     				 * on some platforms. See PostMenu for

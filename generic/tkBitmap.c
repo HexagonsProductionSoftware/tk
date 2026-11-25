@@ -50,7 +50,7 @@
  */
 
 typedef struct TkBitmap {
-    Pixmap bitmap;		/* X identifier for bitmap.  None means this
+    Pixmap bitmap;		/* X identifier for bitmap.  NULL means this
 				 * bitmap was created by Tk_DefineBitmap
 				 * and it isn't currently in use. */
     int width, height;		/* Dimensions of bitmap. */
@@ -142,7 +142,7 @@ Tcl_ObjType tkBitmapObjType = {
  * Results:
  *	The return value is the X identifer for the desired bitmap
  *	(i.e. a Pixmap with a single plane), unless string couldn't be
- *	parsed correctly.  In this case, None is returned and an error
+ *	parsed correctly.  In this case, NULL is returned and an error
  *	message is left in the interp's result.  The caller should never
  *	modify the bitmap that is returned, and should eventually call
  *	Tk_FreeBitmapFromObj when the bitmap is no longer needed.
@@ -221,7 +221,7 @@ Tk_AllocBitmapFromObj(interp, tkwin, objPtr)
     bitmapPtr = GetBitmap(interp, tkwin, Tcl_GetString(objPtr));
     objPtr->internalRep.twoPtrValue.ptr1 = (VOID *) bitmapPtr;
     if (bitmapPtr == NULL) {
-	return None;
+	return NULL;
     }
     bitmapPtr->objRefCount++;
     return bitmapPtr->bitmap;
@@ -238,7 +238,7 @@ Tk_AllocBitmapFromObj(interp, tkwin, objPtr)
  * Results:
  *	The return value is the X identifer for the desired bitmap
  *	(i.e. a Pixmap with a single plane), unless string couldn't be
- *	parsed correctly.  In this case, None is returned and an error
+ *	parsed correctly.  In this case, NULL is returned and an error
  *	message is left in the interp's result.  The caller should never
  *	modify the bitmap that is returned, and should eventually call
  *	Tk_FreeBitmap when the bitmap is no longer needed.
@@ -262,7 +262,7 @@ Tk_GetBitmap(interp, tkwin, string)
 {
     TkBitmap *bitmapPtr = GetBitmap(interp, tkwin, string);
     if (bitmapPtr == NULL) {
-	return None;
+	return NULL;
     }
     return bitmapPtr->bitmap;
 }
@@ -280,7 +280,7 @@ Tk_GetBitmap(interp, tkwin, string)
  * Results:
  *	The return value is the X identifer for the desired bitmap
  *	(i.e. a Pixmap with a single plane), unless string couldn't be
- *	parsed correctly.  In this case, None is returned and an error
+ *	parsed correctly.  In this case, NULL is returned and an error
  *	message is left in the interp's result.  The caller should never
  *	modify the bitmap that is returned, and should eventually call
  *	Tk_FreeBitmap when the bitmap is no longer needed.
@@ -380,12 +380,12 @@ GetBitmap(interp, tkwin, string)
 	    /*
 	     * The following platform specific call allows the user to
 	     * define bitmaps that may only exist during run time.  If
-	     * it returns None nothing was found and we return the error.
+	     * it returns NULL nothing was found and we return the error.
 	     */
 	    bitmap = TkpGetNativeAppBitmap(Tk_Display(tkwin), string,
 		    &width, &height);
 	    
-	    if (bitmap == None) {
+	    if (bitmap == NULL) {
 		if (interp != NULL) {
 		    Tcl_AppendResult(interp, "bitmap \"", string,
 			"\" not defined", (char *) NULL);
@@ -399,7 +399,7 @@ GetBitmap(interp, tkwin, string)
 	    if (predefPtr->native) {
 		bitmap = TkpCreateNativeBitmap(Tk_Display(tkwin),
 		    predefPtr->source);
-		if (bitmap == None) {
+		if (bitmap == NULL) {
 		    panic("native bitmap creation failed");
 		}
 	    } else {
@@ -788,7 +788,7 @@ DupBitmapObjProc(srcObjPtr, dupObjPtr)
  * Results:
  *	The return value is the X identifer for the desired bitmap
  *	(a one-plane Pixmap), unless it couldn't be created properly.
- *	In this case, None is returned and an error message is left in
+ *	In this case, NULL is returned and an error message is left in
  *	the interp's result.  The caller should never modify the bitmap that
  *	is returned, and should eventually call Tk_FreeBitmap when the
  *	bitmap is no longer needed.

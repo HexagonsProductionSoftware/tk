@@ -20,6 +20,10 @@ option add *Text.borderWidth 2
 option add *Text.highlightThickness 2
 option add *Text.font {Courier -12}
 
+# The line height of that font. Tests that centre an embedded window on a
+# line compute the expected position from it, as in Tk 8.6.
+set fixedHeight [font metrics {Courier -12} -linespace]
+
 text .t -width 30 -height 6 -bd 2 -highlightthickness 2
 pack append . .t {top expand fill}
 update
@@ -634,7 +638,8 @@ test textWind-13.2 {EmbWinBboxProc procedure} {
     .t window create 1.2 -window .f -align center -padx 2 -pady 1
     update
     list [winfo geom .f] [.t bbox .f]
-} {5x5+21+9 {21 9 5 5}}
+} [list 5x5+21+[expr {6+($fixedHeight-7)/2}] \
+	[list 21 [expr {6+($fixedHeight-7)/2}] 5 5]]
 test textWind-13.3 {EmbWinBboxProc procedure} {fonts} {
     .t delete 1.0 end
     .t insert 1.0 "Some sample text"
@@ -691,7 +696,8 @@ test textWind-13.9 {EmbWinBboxProc procedure, spacing options} {
     .t window create 1.2 -window .f -align center -padx 2 -pady 1
     update
     list [winfo geom .f] [.t bbox .f]
-} {5x5+21+14 {21 14 5 5}}
+} [list 5x5+21+[expr {10+($fixedHeight-5)/2}] \
+	[list 21 [expr {10+($fixedHeight-5)/2}] 5 5]]
 .t configure -spacing1 0 -spacing2 0 -spacing3 0
 
 test textWind-14.1 {EmbWinDelayedUnmap procedure} {

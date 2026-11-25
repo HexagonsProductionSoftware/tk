@@ -662,7 +662,7 @@ TkClipInit(interp, dispPtr)
     Tk_ChangeWindowAttributes(dispPtr->clipWindow, CWOverrideRedirect, &atts);
     Tk_MakeWindowExist(dispPtr->clipWindow);
 
-    if (dispPtr->multipleAtom == None) {
+    if (dispPtr->multipleAtom == NULL) {
 	/*
 	 * Need to invoke selection initialization to make sure that
 	 * atoms we depend on below are defined.

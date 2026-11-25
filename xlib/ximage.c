@@ -48,7 +48,7 @@ XCreateBitmapFromData(display, d, data, width, height)
     pix = Tk_GetPixmap(display, d, (int) width, (int) height, 1);
     gc = XCreateGC(display, pix, 0, NULL);
     if (gc == NULL) {
-	return None;
+	return NULL;
     }
     ximage = XCreateImage(display, NULL, 1, XYBitmap, 0, (char*) data, width,
 	    height, 8, (width + 7) / 8);

@@ -350,7 +350,7 @@ Tk_GetVisual(interp, tkwin, string, depthPtr, colormapPtr)
  *
  * Results:
  *	The return value is normally the X resource identifier for the
- *	colormap.  If an error occurs, None is returned and an error
+ *	colormap.  If an error occurs, NULL is returned and an error
  *	message is placed in the interp's result.
  *
  * Side effects:
@@ -401,17 +401,17 @@ Tk_GetColormap(interp, tkwin, string)
 
     other = Tk_NameToWindow(interp, string, tkwin);
     if (other == NULL) {
-	return None;
+	return NULL;
     }
     if (Tk_Screen(other) != Tk_Screen(tkwin)) {
 	Tcl_AppendResult(interp, "can't use colormap for ", string,
 		": not on same screen", (char *) NULL);
-	return None;
+	return NULL;
     }
     if (Tk_Visual(other) != Tk_Visual(tkwin)) {
 	Tcl_AppendResult(interp, "can't use colormap for ", string,
 		": incompatible visuals", (char *) NULL);
-	return None;
+	return NULL;
     }
     colormap = Tk_Colormap(other);
 

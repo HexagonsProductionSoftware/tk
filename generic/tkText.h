@@ -315,14 +315,14 @@ typedef struct TkTextTag {
     char *reliefString;		/* -relief option string (malloc-ed).
 				 * NULL means option not specified. */
     int relief;			/* 3-D relief for background. */
-    Pixmap bgStipple;		/* Stipple bitmap for background.  None
+    Pixmap bgStipple;		/* Stipple bitmap for background.  NULL
 				 * means no value specified here. */
     XColor *fgColor;		/* Foreground color for text.  NULL means
 				 * no value specified here. */
     Tk_Font tkfont;		/* Font for displaying text.  NULL means
 				 * no value specified here. */
     Pixmap fgStipple;		/* Stipple bitmap for text and other
-				 * foreground stuff.   None means no value
+				 * foreground stuff.   NULL means no value
 				 * specified here.*/
     char *justifyString;	/* -justify option string (malloc-ed).
 				 * NULL means option not specified. */
@@ -531,7 +531,7 @@ typedef struct TkText {
 				/* Color for drawing traversal highlight
 				 * area when highlight is off. */
     XColor *highlightColorPtr;	/* Color for drawing traversal highlight. */
-    Tk_Cursor cursor;		/* Current cursor for window, or None. */
+    Tk_Cursor cursor;		/* Current cursor for window, or NULL. */
     XColor *fgColor;		/* Default foreground color for text. */
     Tk_Font tkfont;		/* Default font for displaying text. */
     int charWidth;		/* Width of average character in default

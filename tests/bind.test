@@ -1131,6 +1131,11 @@ test bind-15.23 {MatchPatterns procedure, time wrap-around} {
     setup
     bind .b.f <Double-1> {set x 1}
     set x 0
+    # The event ring is shared by all windows, and the new .b.f can get the window id of the one
+    # that bind-15.22 used, whose last Button-1 was at time 200: start a new sequence, as the
+    # tests before bind-15.22 do, so that the Button-1 at -100 cannot make a double click with it.
+    event gen .b.f <Button-2>
+    event gen .b.f <ButtonRelease-2>
     event gen .b.f <Button-1> -time -100
     event gen .b.f <Button-1> -time 500
     event gen .b.f <ButtonRelease-1>

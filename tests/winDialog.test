@@ -22,6 +22,7 @@ if {[testConstraint testwinevent]} {
 proc start {arg} {
     set ::tk_dialog 0
     set ::iter_after 0
+    set ::dialog_ready 0
 
     after 1 $arg
 }
@@ -32,6 +33,15 @@ proc then {cmd} {
 
     afterbody
     vwait ::dialogresult
+    # A test can end before afterbody has run its command, for example when
+    # the dialog fails at once and the start script sets dialogresult itself
+    # (winDialog-5.15). Cancel the afterbody that is still waiting: it would
+    # otherwise run in the next test, with that test's command.
+    foreach id [after info] {
+	if {[lindex [after info $id] 0] eq "afterbody"} {
+	    after cancel $id
+	}
+    }
     return $::dialogresult
 }
 
@@ -42,6 +52,15 @@ proc afterbody {} {
 	    return
 	}
 	after 150 {afterbody}
+	return
+    }
+    # tk_dialog is set when the dialog is created, but its controls and the
+    # shell view in it are not ready yet (Tk 8.6 waits too). A click then may
+    # be lost, so that the dialog stays open, and destroying the parent of the
+    # dialog then can make the shell free memory twice.
+    if {!$::dialog_ready} {
+	set ::dialog_ready 1
+	after 500 {afterbody}
 	return
     }
     uplevel #0 {set dialogresult [eval $command]}

@@ -100,10 +100,10 @@ TkpDisplayMenuButton(clientData)
 	border = mbPtr->normalBorder;
     }
 
-    if (mbPtr->image != None) {
+    if (mbPtr->image != NULL) {
 	Tk_SizeOfImage(mbPtr->image, &width, &height);
 	haveImage = 1;
-    } else if (mbPtr->bitmap != None) {
+    } else if (mbPtr->bitmap != NULL) {
 	Tk_SizeOfBitmap(mbPtr->display, mbPtr->bitmap, &width, &height);
 	haveImage = 1;
     }
@@ -186,7 +186,7 @@ TkpDisplayMenuButton(clientData)
 	if (mbPtr->image != NULL) {
 	    Tk_RedrawImage(mbPtr->image, 0, 0, width, height, pixmap,
 		    imageXOffset, imageYOffset);
-	} else if (mbPtr->bitmap != None) {
+	} else if (mbPtr->bitmap != NULL) {
 	    XSetClipOrigin(mbPtr->display, gc, imageXOffset, imageYOffset);
 	    XCopyPlane(mbPtr->display, mbPtr->bitmap, pixmap,
 		    gc, 0, 0, (unsigned) width, (unsigned) height, 
@@ -206,7 +206,7 @@ TkpDisplayMenuButton(clientData)
 	if (mbPtr->image != NULL) {
 	    Tk_RedrawImage(mbPtr->image, 0, 0, width, height, pixmap,
 		    imageXOffset, imageYOffset);
-	} else if (mbPtr->bitmap != None) {
+	} else if (mbPtr->bitmap != NULL) {
 	    XSetClipOrigin(mbPtr->display, gc, x, y);
 	    XCopyPlane(mbPtr->display, mbPtr->bitmap, pixmap,
 		    gc, 0, 0, (unsigned) width, (unsigned) height, 
@@ -360,10 +360,10 @@ TkpComputeMenuButtonGeometry(mbPtr)
     txtHeight = 0;
     avgWidth = 0;
 
-    if (mbPtr->image != None) {
+    if (mbPtr->image != NULL) {
 	Tk_SizeOfImage(mbPtr->image, &width, &height);
 	haveImage = 1;
-    } else if (mbPtr->bitmap != None) {
+    } else if (mbPtr->bitmap != NULL) {
 	Tk_SizeOfBitmap(mbPtr->display, mbPtr->bitmap, &width, &height);
 	haveImage = 1;
     }

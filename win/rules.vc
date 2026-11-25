@@ -219,6 +219,7 @@ LINKERFLAGS     =-ltcg
 STATIC_BUILD	= 0
 TCL_THREADS	= 0
 DEBUG		= 0
+SYMBOLS		= 0
 PROFILE		= 0
 MSVCRT		= 0
 LOIMPACT	= 0
@@ -255,6 +256,13 @@ TCL_THREADS	= 0
 DEBUG		= 1
 !else
 DEBUG		= 0
+!endif
+# pdbs, backported from Tk 8.5: a release build with a program database.
+!if [nmakehlp -f $(OPTS) "pdbs"]
+!message *** Doing pdbs
+SYMBOLS		= 1
+!else
+SYMBOLS		= 0
 !endif
 !if [nmakehlp -f $(OPTS) "profile"]
 !message *** Doing profile
@@ -487,13 +495,19 @@ TCL_DOTVERSION	= 8.4
 TCL_VERSION	= $(TCL_DOTVERSION:.=)
 
 !if $(TCLINSTALL)
-TCLSH		= "$(_INSTALLDIR)\bin\tclsh$(TCL_VERSION)$(SUFX).exe"
-TCLSTUBLIB	= "$(_INSTALLDIR)\lib\tclstub$(TCL_VERSION).lib"
-TCLIMPLIB	= "$(_INSTALLDIR)\lib\tcl$(TCL_VERSION)$(SUFX).lib"
-TCL_LIBRARY	= $(_INSTALLDIR)\lib
-TCLREGLIB	= "$(_INSTALLDIR)\lib\tclreg12$(SUFX:t=).lib"
-TCLDDELIB	= "$(_INSTALLDIR)\lib\tcldde13$(SUFX:t=).lib"
+# An installed Tcl, such as a tree of the Hexagon.PS.Tcl package. Take it from TCLDIR, not
+# from INSTALLDIR (as in Tk 8.5), and take coffbase.txt from its win directory if it has one.
+TCLSH		= "$(_TCLDIR)\bin\tclsh$(TCL_VERSION)$(SUFX).exe"
+TCLSTUBLIB	= "$(_TCLDIR)\lib\tclstub$(TCL_VERSION).lib"
+TCLIMPLIB	= "$(_TCLDIR)\lib\tcl$(TCL_VERSION)$(SUFX).lib"
+TCL_LIBRARY	= $(_TCLDIR)\lib\tcl$(TCL_DOTVERSION)
+TCLREGLIB	= "$(_TCLDIR)\lib\tclreg12$(SUFX:t=).lib"
+TCLDDELIB	= "$(_TCLDIR)\lib\tcldde13$(SUFX:t=).lib"
+!if exist("$(_TCLDIR)\win\coffbase.txt")
+COFFBASE	= "$(_TCLDIR)\win\coffbase.txt"
+!else
 COFFBASE	= \must\have\tcl\sources\to\build\this\target
+!endif
 TCLTOOLSDIR	= \must\have\tcl\sources\to\build\this\target
 !else
 TCLSH		= "$(_TCLDIR)\win\$(BUILDDIRTOP)\tclsh$(TCL_VERSION)$(SUFX).exe"

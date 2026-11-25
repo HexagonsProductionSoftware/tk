@@ -61,8 +61,8 @@ TkpCreateScrollbar(tkwin)
     Tk_Window tkwin;
 {
     UnixScrollbar *scrollPtr = (UnixScrollbar *)ckalloc(sizeof(UnixScrollbar));
-    scrollPtr->troughGC = None;
-    scrollPtr->copyGC = None;
+    scrollPtr->troughGC = NULL;
+    scrollPtr->copyGC = NULL;
 
     Tk_CreateEventHandler(tkwin,
 	    ExposureMask|StructureNotifyMask|FocusChangeMask,
@@ -358,10 +358,10 @@ TkpDestroyScrollbar(scrollPtr)
 {
     UnixScrollbar *unixScrollPtr = (UnixScrollbar *)scrollPtr;
 
-    if (unixScrollPtr->troughGC != None) {
+    if (unixScrollPtr->troughGC != NULL) {
 	Tk_FreeGC(scrollPtr->display, unixScrollPtr->troughGC);
     }
-    if (unixScrollPtr->copyGC != None) {
+    if (unixScrollPtr->copyGC != NULL) {
 	Tk_FreeGC(scrollPtr->display, unixScrollPtr->copyGC);
     }
 }
@@ -398,11 +398,11 @@ TkpConfigureScrollbar(scrollPtr)
 
     gcValues.foreground = scrollPtr->troughColorPtr->pixel;
     new = Tk_GetGC(scrollPtr->tkwin, GCForeground, &gcValues);
-    if (unixScrollPtr->troughGC != None) {
+    if (unixScrollPtr->troughGC != NULL) {
 	Tk_FreeGC(scrollPtr->display, unixScrollPtr->troughGC);
     }
     unixScrollPtr->troughGC = new;
-    if (unixScrollPtr->copyGC == None) {
+    if (unixScrollPtr->copyGC == NULL) {
 	gcValues.graphics_exposures = False;
 	unixScrollPtr->copyGC = Tk_GetGC(scrollPtr->tkwin, GCGraphicsExposures,
 	    &gcValues);

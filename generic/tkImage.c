@@ -730,7 +730,7 @@ Tk_PostscriptImage(image, interp, tkwin, psinfo, x, y, width, height, prepass)
 
     gcValues.foreground = WhitePixelOfScreen(Tk_Screen(tkwin));
     newGC = Tk_GetGC(tkwin, GCForeground, &gcValues);
-    if (newGC != None) {
+    if (newGC != NULL) {
 	XFillRectangle(Tk_Display(tkwin), pmap, newGC,
 		0, 0, (unsigned int)width, (unsigned int)height);
 	Tk_FreeGC(Tk_Display(tkwin), newGC);

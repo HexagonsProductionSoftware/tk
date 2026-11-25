@@ -401,7 +401,7 @@ Tk_TextCmd(clientData, interp, argc, argv)
     Tcl_InitHashTable(&textPtr->imageTable, TCL_STRING_KEYS);
     textPtr->state = TK_STATE_NORMAL;
     textPtr->relief = TK_RELIEF_FLAT;
-    textPtr->cursor = None;
+    textPtr->cursor = NULL;
     textPtr->charWidth = 1;
     textPtr->wrapMode = TEXT_WRAPMODE_CHAR;
     textPtr->prevWidth = Tk_Width(new);
@@ -1099,10 +1099,10 @@ ConfigureText(interp, textPtr, argc, argv, flags)
     if ((textPtr->selTagPtr->border != NULL)
 	    || (textPtr->selTagPtr->bdString != NULL)
 	    || (textPtr->selTagPtr->reliefString != NULL)
-	    || (textPtr->selTagPtr->bgStipple != None)
+	    || (textPtr->selTagPtr->bgStipple != NULL)
 	    || (textPtr->selTagPtr->fgColor != NULL)
-	    || (textPtr->selTagPtr->tkfont != None)
-	    || (textPtr->selTagPtr->fgStipple != None)
+	    || (textPtr->selTagPtr->tkfont != NULL)
+	    || (textPtr->selTagPtr->fgStipple != NULL)
 	    || (textPtr->selTagPtr->justifyString != NULL)
 	    || (textPtr->selTagPtr->lMargin1String != NULL)
 	    || (textPtr->selTagPtr->lMargin2String != NULL)

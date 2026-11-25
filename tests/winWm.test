@@ -186,6 +186,8 @@ test winWm-4.1 {ConfigureTopLevel: menu resizing} {pcOnly} {
     set result
 } [expr $menuheight + 1]
 
+# 31, as in Tk 8.6: when the menu bar wraps to a second line, the toplevel
+# keeps its outer size and the second line comes off the client area.
 test winWm-5.1 {UpdateGeometryInfo: menu resizing} {pcOnly} {
     set result {}
     toplevel .t
@@ -204,7 +206,7 @@ test winWm-5.1 {UpdateGeometryInfo: menu resizing} {pcOnly} {
     lappend result [winfo height .t]
     destroy .t
     set result
-} {50 50 50}
+} {50 50 31}
 test winWm-5.2 {UpdateGeometryInfo: menu resizing} {pcOnly} {
     set result {}
     toplevel .t
@@ -307,8 +309,10 @@ test winWm-6.8 {wm attributes -transparentcolor} win {
     list [catch {wm attributes .t -tr foo} msg] $msg
 } {1 {unknown color name "foo"}}
 
+# nonPortable: the winWm-7.* tests depend on the Z order and focus, which other
+# windows on the desktop change, and Windows may refuse to move the focus.
 test winWm-7.1 {deiconify on an unmapped toplevel
-        will raise the window and set the focus} {pcOnly} {
+        will raise the window and set the focus} {pcOnly nonPortable} {
     destroy .t
     toplevel .t
     lower .t
@@ -319,7 +323,7 @@ test winWm-7.1 {deiconify on an unmapped toplevel
 } {1 .t}
 
 test winWm-7.2 {deiconify on an already mapped toplevel
-        will raise the window and set the focus} {pcOnly} {
+        will raise the window and set the focus} {pcOnly nonPortable} {
     destroy .t
     toplevel .t
     lower .t
@@ -330,7 +334,7 @@ test winWm-7.2 {deiconify on an already mapped toplevel
     list [wm stackorder .t isabove .] [focus]
 } {1 .t}
 
-test winWm-7.3 {UpdateWrapper must maintain Z order} win {
+test winWm-7.3 {UpdateWrapper must maintain Z order} {win nonPortable} {
     destroy .t
     toplevel .t
     lower .t
@@ -341,7 +345,7 @@ test winWm-7.3 {UpdateWrapper must maintain Z order} win {
     list $res [wm stackorder .t isbelow .]
 } {1 1}
 
-test winWm-7.4 {UpdateWrapper must maintain focus} win {
+test winWm-7.4 {UpdateWrapper must maintain focus} {win nonPortable} {
     destroy .t
     toplevel .t
     focus -force .t

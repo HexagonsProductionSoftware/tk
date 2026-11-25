@@ -224,7 +224,7 @@ TkpCreateButton(tkwin)
  *	the instance, and generates a new Window object.
  *
  * Results:
- *	Returns the newly allocated Window object, or None on failure.
+ *	Returns the newly allocated Window object, or NULL on failure.
  *
  * Side effects:
  *	Causes a new Button control to come into existence.
@@ -441,10 +441,10 @@ TkpDisplayButton(clientData)
      * Display image or bitmap or text for button.
      */
 
-    if (butPtr->image != None) {
+    if (butPtr->image != NULL) {
 	Tk_SizeOfImage(butPtr->image, &width, &height);
 	haveImage = 1;
-    } else if (butPtr->bitmap != None) {
+    } else if (butPtr->bitmap != NULL) {
 	Tk_SizeOfBitmap(butPtr->display, butPtr->bitmap, &width, &height);
 	haveImage = 1;
     }
@@ -797,7 +797,7 @@ TkpComputeButtonGeometry(butPtr)
     if (butPtr->image != NULL) {
 	Tk_SizeOfImage(butPtr->image, &imgWidth, &imgHeight);
 	haveImage = 1;
-    } else if (butPtr->bitmap != None) {
+    } else if (butPtr->bitmap != NULL) {
 	Tk_SizeOfBitmap(butPtr->display, butPtr->bitmap,
 			&imgWidth, &imgHeight);
 	haveImage = 1;

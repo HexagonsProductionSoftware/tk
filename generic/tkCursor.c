@@ -75,7 +75,7 @@ Tcl_ObjType tkCursorObjType = {
  * Results:
  *	The return value is the X identifer for the desired cursor,
  *	unless objPtr couldn't be parsed correctly.  In this case,
- *	None is returned and an error message is left in the interp's result.
+ *	NULL is returned and an error message is left in the interp's result.
  *	The caller should never modify the cursor that is returned, and
  *	should eventually call Tk_FreeCursorFromObj when the cursor is no 
  *	longer needed.
@@ -151,7 +151,7 @@ Tk_AllocCursorFromObj(interp, tkwin, objPtr)
     cursorPtr = TkcGetCursor(interp, tkwin, Tcl_GetString(objPtr));
     objPtr->internalRep.twoPtrValue.ptr1 = (VOID *) cursorPtr;
     if (cursorPtr == NULL) {
-	return None;
+	return NULL;
     } else {
 	cursorPtr->objRefCount++;
 	return cursorPtr->cursor;
@@ -169,7 +169,7 @@ Tk_AllocCursorFromObj(interp, tkwin, objPtr)
  * Results:
  *	The return value is the X identifer for the desired cursor,
  *	unless string couldn't be parsed correctly.  In this case,
- *	None is returned and an error message is left in the interp's result.
+ *	NULL is returned and an error message is left in the interp's result.
  *	The caller should never modify the cursor that is returned, and
  *	should eventually call Tk_FreeCursor when the cursor is no longer
  *	needed.
@@ -192,7 +192,7 @@ Tk_GetCursor(interp, tkwin, string)
 {
     TkCursor *cursorPtr = TkcGetCursor(interp, tkwin, string);
     if (cursorPtr == NULL) {
-	return None;
+	return NULL;
     }
     return cursorPtr->cursor;
 }
@@ -296,7 +296,7 @@ TkcGetCursor(interp, tkwin, string)
  *
  * Results:
  *	The return value is the X identifer for the desired cursor,
- *	unless it couldn't be created properly.  In this case, None is
+ *	unless it couldn't be created properly.  In this case, NULL is
  *	returned and an error message is left in the interp's result.  The
  *	caller should never modify the cursor that is returned, and
  *	should eventually call Tk_FreeCursor when the cursor is no
@@ -392,7 +392,7 @@ Tk_GetCursorFromData(interp, tkwin, source, mask, width, height,
 
     error:
     Tcl_DeleteHashEntry(dataHashPtr);
-    return None;
+    return NULL;
 }
 
 /*

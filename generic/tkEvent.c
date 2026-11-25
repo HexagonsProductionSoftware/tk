@@ -30,7 +30,7 @@
 
 typedef struct InProgress {
     XEvent *eventPtr;		 /* Event currently being handled. */
-    TkWindow *winPtr;		 /* Window for event.  Gets set to None if
+    TkWindow *winPtr;		 /* Window for event.  Gets set to NULL if
 				  * window is deleted while event is being
 				  * handled. */
     TkEventHandler *nextHandler; /* Next handler in search. */
@@ -552,7 +552,7 @@ TkXErrorHandler (clientData, errEventPtr)
  *
  * ParentXId --
  *
- *	Returns the parent of the given window, or "None"
+ *	Returns the parent of the given window, or "NULL"
  *	if the window doesn't exist.
  *
  * Results:
@@ -587,7 +587,7 @@ ParentXId(display, w)
 
     status = XQueryTree(display, w, &root, &parent, &childList, &nChildren);
 
-    /* Do some cleanup; gotta return "None" if we got an error. */
+    /* Do some cleanup; gotta return "NULL" if we got an error. */
 
     Tk_DeleteErrorHandler(handler);
     XSync(display, False);
@@ -595,7 +595,7 @@ ParentXId(display, w)
 	XFree(childList);
     }
     if (status == 0) {
-        parent = None;
+        parent = NULL;
     }
 
     return parent;
@@ -774,7 +774,7 @@ Tk_HandleEvent(eventPtr)
 	/* Get handlerWindow's parent. */
 
 	parentXId = ParentXId(eventPtr->xany.display, handlerWindow);
-	if (parentXId == None) {
+	if (parentXId == NULL) {
 	    return;
 	}
 
@@ -1051,7 +1051,7 @@ Tk_HandleEvent(eventPtr)
 	 * we DO handle CreateNotify events, so we gotta pass 'em through.
 	 */
 
-	if ((ip.winPtr != None)
+	if ((ip.winPtr != NULL)
 		&& ((mask != SubstructureNotifyMask)
 				|| (eventPtr->type == CreateNotify))) {
 	    TkBindEventProc(winPtr, eventPtr);
@@ -1114,7 +1114,7 @@ TkEventDeadWindow(winPtr)
 		ipPtr->nextHandler = NULL;
 	    }
 	    if (ipPtr->winPtr == winPtr) {
-		ipPtr->winPtr = None;
+		ipPtr->winPtr = NULL;
 	    }
 	}
 	ckfree((char *) handlerPtr);
